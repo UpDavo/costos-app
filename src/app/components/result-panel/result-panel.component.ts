@@ -1,7 +1,9 @@
 import { Component, inject, computed, signal, ElementRef, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { CalculatorStateService } from '../../services/calculator-state.service';
 import { AppStore } from '../../store/app.store';
+import { ProformaStorageService } from '../../services/proforma-storage.service';
 import { BreakdownChartComponent } from './breakdown-chart/breakdown-chart.component';
 import { DepreciationChartComponent } from './depreciation-chart/depreciation-chart.component';
 import { LITERS_PER_GALLON } from '../../services/cost-calculation.service';
@@ -15,6 +17,7 @@ export type DisplayUnit = 'km' | 'liter' | 'gallon' | 'kwh';
   selector: 'app-result-panel',
   imports: [
     CommonModule,
+    FormsModule,
     BreakdownChartComponent, DepreciationChartComponent,
   ],
   templateUrl: './result-panel.component.html',
@@ -22,9 +25,51 @@ export type DisplayUnit = 'km' | 'liter' | 'gallon' | 'kwh';
 export class ResultPanelComponent {
   state = inject(CalculatorStateService);
   appStore = inject(AppStore);
+  proformaStorage = inject(ProformaStorageService);
 
   panelRef = viewChild<ElementRef>('resultPanel');
   screenshotLoading = signal(false);
+
+  saveFormOpen = signal(false);
+  saveName = signal('');
+  saveResult = signal<'success' | 'full' | null>(null);
+
+  openSaveForm(): void {
+    this.saveName.set(this.state.vehicleLookupQuery() || 'Mi vehículo');
+    this.saveFormOpen.set(true);
+    this.saveResult.set(null);
+  }
+
+  cancelSave(): void {
+    this.saveFormOpen.set(false);
+    this.saveResult.set(null);
+  }
+
+  confirmSave(): void {
+    const country = this.appStore.selectedCountry();
+    const saved = this.proformaStorage.save({
+      name: this.saveName().trim() || 'Mi vehículo',
+      countryCode: country.code,
+      currency: country.currency,
+      currencySymbol: country.currencySymbol,
+      vehicle: this.state.vehicle(),
+      fuel: this.state.fuel(),
+      idle: this.state.idle(),
+      obligations: this.state.obligations(),
+      maintenanceItems: this.state.maintenanceItems(),
+      vehicleLookupQuery: this.state.vehicleLookupQuery(),
+      result: this.state.result(),
+    });
+    if (saved) {
+      this.saveResult.set('success');
+      setTimeout(() => {
+        this.saveFormOpen.set(false);
+        this.saveResult.set(null);
+      }, 1400);
+    } else {
+      this.saveResult.set('full');
+    }
+  }
 
   async takeScreenshot() {
     const el = this.panelRef()?.nativeElement;

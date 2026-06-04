@@ -118,6 +118,51 @@
 
   <!-- Actions -->
   <div class="px-5 pb-5 flex flex-col gap-2">
+
+    <!-- Save proforma button / inline form -->
+    @if (!saveFormOpen()) {
+      <button
+        class="w-full py-[10px] px-4 bg-[var(--primary)] text-white text-[0.82rem] font-semibold cursor-pointer transition-all duration-150 flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed border border-[var(--primary)]"
+        (click)="openSaveForm()"
+        [disabled]="proformaStorage.isFull()">
+        <i class="pi pi-bookmark"></i>
+        {{ proformaStorage.isFull() ? 'Máximo ' + proformaStorage.maxCount + ' guardadas' : 'Guardar configuración' }}
+      </button>
+    } @else {
+      <div class="border-[1.5px] border-[var(--primary)] p-3 flex flex-col gap-2">
+        @if (saveResult() === 'success') {
+          <div class="flex items-center justify-center gap-2 py-2 text-[0.82rem] text-green-600 font-medium">
+            <i class="pi pi-check-circle"></i> ¡Configuración guardada!
+          </div>
+        } @else if (saveResult() === 'full') {
+          <div class="text-[0.78rem] text-red-500 text-center">
+            Ya tienes {{ proformaStorage.maxCount }} configuraciones guardadas. Elimina una primero.
+          </div>
+        } @else {
+          <div class="text-[0.7rem] font-mono uppercase tracking-widest text-[var(--muted)] mb-1">Nombre de la configuración</div>
+          <input
+            type="text"
+            class="input-field text-[0.82rem]"
+            [(ngModel)]="saveName"
+            placeholder="Ej: Toyota Corolla 2020"
+            (keydown.enter)="confirmSave()"
+            (keydown.escape)="cancelSave()" />
+          <div class="flex gap-2">
+            <button
+              class="flex-1 py-[8px] px-3 bg-[var(--primary)] text-white text-[0.78rem] font-semibold cursor-pointer border border-[var(--primary)] hover:opacity-90"
+              (click)="confirmSave()">
+              <i class="pi pi-check mr-1"></i>Guardar
+            </button>
+            <button
+              class="py-[8px] px-3 bg-transparent text-[var(--muted)] text-[0.78rem] cursor-pointer border border-[var(--border2)] hover:border-[var(--primary)] hover:text-[var(--primary)]"
+              (click)="cancelSave()">
+              Cancelar
+            </button>
+          </div>
+        }
+      </div>
+    }
+
     <button
       class="w-full py-[10px] px-4 bg-transparent border-[1.5px] border-[var(--border2)] text-[var(--muted)] text-[0.82rem] font-medium cursor-pointer transition-all duration-150 flex items-center justify-center gap-2 hover:border-[var(--primary)] hover:text-[var(--primary)] disabled:opacity-50 disabled:cursor-not-allowed"
       (click)="takeScreenshot()"

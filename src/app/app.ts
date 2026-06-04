@@ -5,6 +5,7 @@ import { FuelCardComponent } from './components/fuel-card/fuel-card.component';
 import { ObligationsCardComponent } from './components/obligations-card/obligations-card.component';
 import { MaintenanceCardComponent } from './components/maintenance-card/maintenance-card.component';
 import { ResultPanelComponent } from './components/result-panel/result-panel.component';
+import { ProformaCompareComponent } from './components/proforma-compare/proforma-compare.component';
 import { LocalePillComponent } from './components/shared/locale-pill.component';
 import { AccordionGroupComponent } from './components/shared/accordion-group.component';
 import { AccordionItemComponent } from './components/shared/accordion-item.component';
@@ -20,6 +21,7 @@ import { CalculatorStateService } from './services/calculator-state.service';
     ObligationsCardComponent,
     MaintenanceCardComponent,
     ResultPanelComponent,
+    ProformaCompareComponent,
     LocalePillComponent,
     AccordionGroupComponent,
     AccordionItemComponent,
@@ -49,6 +51,9 @@ import { CalculatorStateService } from './services/calculator-state.service';
         <div class="min-[901px]:sticky min-[901px]:top-6">
           <app-result-panel />
         </div>
+      </div>
+      <div class="px-4 min-[901px]:px-8 pb-8">
+        <app-proforma-compare />
       </div>
       <div class="flex-1"></div>
       <app-footer />

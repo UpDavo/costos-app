@@ -67,3 +67,19 @@ export interface DeprPoint {
   year: number;
   value: number;
 }
+
+export interface SavedProforma {
+  id: string;
+  name: string;
+  savedAt: string;
+  countryCode: string;
+  currency: string;
+  currencySymbol: string;
+  vehicle: VehicleData;
+  fuel: FuelData;
+  idle: IdleData;
+  obligations: ObligationsData;
+  maintenanceItems: MaintenanceItem[];
+  vehicleLookupQuery: string;
+  result: CostBreakdown;
+}
