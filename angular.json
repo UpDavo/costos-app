@@ -15,11 +15,7 @@
           "options": {
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
-            "outputPath": {
-              "base": ".",
-              "browser": "browser",
-              "server": "server"
-            },
+            "outputPath": "dist/costos-app",
             "assets": [
               {
                 "glob": "**/*",
@@ -40,6 +36,11 @@
           },
           "configurations": {
             "production": {
+              "optimization": {
+                "fonts": {
+                  "inline": false
+                }
+              },
               "budgets": [
                 {
                   "type": "initial",
