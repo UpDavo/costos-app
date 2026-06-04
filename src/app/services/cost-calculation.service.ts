@@ -27,6 +27,9 @@ const ACCEL_RATES = [
 @Injectable({ providedIn: 'root' })
 export class CostCalculationService {
   fuelCostPerKm(fuel: FuelData): number {
+    if (fuel.type === 'electric') {
+      return ((fuel.consumptionKwh || 20) * (fuel.pricePerKwh || 0.10)) / 100;
+    }
     const pricePerLiter = fuel.pricePerGal / LITERS_PER_GALLON;
     if (fuel.unit === 'kmL') {
       return pricePerLiter / (fuel.rendimiento || 1);
@@ -35,7 +38,7 @@ export class CostCalculationService {
   }
 
   idleCostPerKm(idle: IdleData, fuel: FuelData, annualKm: number): number {
-    if (!idle.enabled || annualKm <= 0) return 0;
+    if (!idle.enabled || annualKm <= 0 || fuel.type === 'electric') return 0;
     const pricePerLiter = fuel.pricePerGal / LITERS_PER_GALLON;
     return (idle.lph * idle.hours * pricePerLiter) / annualKm;
   }

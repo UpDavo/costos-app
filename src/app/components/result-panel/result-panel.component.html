@@ -16,7 +16,7 @@
     <div class="text-[0.72rem] text-[var(--primary-light)] font-mono mb-3">{{ appStore.selectedCountry().currency }} / {{ unitLabel() }} · todos los costos incluidos</div>
     <!-- Unit switch -->
     <div class="flex justify-center gap-[3px]">
-      @for (opt of ([{id:'km',label:'/ km'},{id:'liter',label:'/ litro'},{id:'gallon',label:'/ galón'}]); track opt.id) {
+      @for (opt of unitOptions(); track opt.id) {
         <button
           class="px-3 py-[4px] text-[0.65rem] font-mono tracking-wide border transition-all duration-150 cursor-pointer"
           [ngClass]="displayUnit() === opt.id
@@ -27,6 +27,24 @@
         </button>
       }
     </div>
+    <!-- Vehicle specs -->
+    @if (vehicleSpecs()) {
+      <div class="mt-3 flex justify-center gap-[6px] flex-wrap">
+        @if (state.vehicle().isElectric) {
+          <span class="text-[0.62rem] font-mono bg-[var(--primary)]/20 text-[var(--primary-light)] px-2 py-[2px]">⚡ ELÉCTRICO</span>
+        }
+        @if (state.vehicle().engineDisplacement && !state.vehicle().isElectric) {
+          <span class="text-[0.62rem] font-mono bg-white/10 text-white/60 px-2 py-[2px]">{{ state.vehicle().engineDisplacement }}L</span>
+        }
+        @if (state.vehicle().turbo && !state.vehicle().isElectric) {
+          <span class="text-[0.62rem] font-mono bg-white/10 text-white/60 px-2 py-[2px]">TURBO</span>
+        }
+        <span class="text-[0.62rem] font-mono bg-white/10 text-white/60 px-2 py-[2px]">{{ state.vehicle().transmission === 'manual' ? 'MANUAL' : 'AUTOMÁTICO' }}</span>
+        @if (state.vehicle().purchaseKm > 0) {
+          <span class="text-[0.62rem] font-mono bg-white/10 text-white/60 px-2 py-[2px]">USADO · {{ state.vehicle().purchaseKm | number:'1.0-0' }} km</span>
+        }
+      </div>
+    }
   </div>
 
   <!-- Breakdown list -->

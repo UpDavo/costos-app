@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { HeroComponent } from './components/hero/hero.component';
 import { VehicleCardComponent } from './components/vehicle-card/vehicle-card.component';
 import { FuelCardComponent } from './components/fuel-card/fuel-card.component';
@@ -9,6 +9,7 @@ import { LocalePillComponent } from './components/shared/locale-pill.component';
 import { AccordionGroupComponent } from './components/shared/accordion-group.component';
 import { AccordionItemComponent } from './components/shared/accordion-item.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { CalculatorStateService } from './services/calculator-state.service';
 
 @Component({
   selector: 'app-root',
@@ -33,7 +34,7 @@ import { FooterComponent } from './components/footer/footer.component';
             <app-accordion-item [index]="0" title="Datos del vehículo" icon="pi-car">
               <app-vehicle-card />
             </app-accordion-item>
-            <app-accordion-item [index]="1" title="Combustible" icon="pi-bolt">
+            <app-accordion-item [index]="1" [title]="state.fuelSectionTitle()" [icon]="state.isElectric() ? 'pi-bolt' : 'pi-bolt'">
               <app-fuel-card />
             </app-accordion-item>
             <app-accordion-item [index]="2" title="Obligaciones anuales" icon="pi-shield">
@@ -55,4 +56,6 @@ import { FooterComponent } from './components/footer/footer.component';
     <app-locale-pill />
   `,
 })
-export class App { }
+export class App {
+  state = inject(CalculatorStateService);
+}

@@ -8,7 +8,7 @@ import { LITERS_PER_GALLON } from '../../services/cost-calculation.service';
 
 interface BreakdownRow { label: string; icon: string; perKm: number; color: string; }
 
-export type DisplayUnit = 'km' | 'liter' | 'gallon';
+export type DisplayUnit = 'km' | 'liter' | 'gallon' | 'kwh';
 
 @Component({
   selector: 'app-result-panel',
@@ -29,10 +29,16 @@ export class ResultPanelComponent {
     return f.unit === 'kmL' ? f.rendimiento : f.rendimiento / LITERS_PER_GALLON;
   });
 
+  private kmPerKwh = computed(() => {
+    const f = this.state.fuel();
+    return (f.consumptionKwh || 20) > 0 ? 100 / (f.consumptionKwh || 20) : 5;
+  });
+
   multiplier = computed(() => {
     const u = this.displayUnit();
     if (u === 'liter') return this.kmPerLiter();
     if (u === 'gallon') return this.kmPerLiter() * LITERS_PER_GALLON;
+    if (u === 'kwh') return this.kmPerKwh();
     return 1;
   });
 
@@ -40,6 +46,7 @@ export class ResultPanelComponent {
     const u = this.displayUnit();
     if (u === 'liter') return 'litro';
     if (u === 'gallon') return 'galón';
+    if (u === 'kwh') return 'kWh';
     return 'km';
   });
 
@@ -47,11 +54,21 @@ export class ResultPanelComponent {
     const u = this.displayUnit();
     if (u === 'liter') return 'por litro de combustible';
     if (u === 'gallon') return 'por galón de combustible';
+    if (u === 'kwh') return 'por kWh consumido';
     return 'por kilómetro recorrido';
   });
 
   heroFormat = computed(() => this.displayUnit() === 'km' ? '1.3-3' : '1.2-2');
   rowFormat  = computed(() => this.displayUnit() === 'km' ? '1.4-4' : '1.3-3');
+
+  unitOptions = computed(() => {
+    const isElectric = this.state.vehicle().isElectric;
+    const base = [{ id: 'km', label: '/ km' }];
+    if (isElectric) return [...base, { id: 'kwh', label: '/ kWh' }];
+    return [...base, { id: 'liter', label: '/ litro' }, { id: 'gallon', label: '/ galón' }];
+  });
+
+  vehicleSpecs = this.state.vehicleSpecsBadge;
 
   convert(perKm: number): number {
     return perKm * this.multiplier();

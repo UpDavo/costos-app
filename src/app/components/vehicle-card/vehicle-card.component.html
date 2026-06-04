@@ -69,11 +69,12 @@
     }
   </div>
 
-  <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
+  <div class="grid gap-3"
+       [ngClass]="state.isElectric() ? 'grid-cols-1 min-[520px]:grid-cols-2' : 'grid-cols-1 min-[520px]:grid-cols-3'">
     <div class="flex flex-col gap-[5px]">
       <label
         class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
-        Precio de compra original ({{ appStore.selectedCountry().currency }})
+        Precio de compra ({{ appStore.selectedCountry().currency }})
         <app-info-tip
           text="Lo que pagaste al comprar el auto. Usa el precio original, no el valor actual de mercado." />
       </label>
@@ -101,6 +102,33 @@
         <i class="pi pi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted)] text-[0.65rem] pointer-events-none"></i>
       </div>
     </div>
+    @if (!state.isElectric()) {
+      <div class="flex flex-col gap-[5px]">
+        <label
+          class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+          Motor
+          <app-info-tip
+            text="Cilindraje del motor. Ej: 1.6, 2.5, 3.2. Motores más grandes consumen más combustible." />
+        </label>
+        <div class="flex gap-[6px]">
+          <input
+            type="text"
+            class="input-field flex-1 min-w-0"
+            [ngModel]="state.vehicle().engineDisplacement"
+            (ngModelChange)="state.patchVehicle({ engineDisplacement: $event })"
+            placeholder="2.5, 1.6T…" />
+          <button
+            type="button"
+            class="h-[39px] px-3 border-[1.5px] text-[0.75rem] font-medium cursor-pointer transition-all duration-150 whitespace-nowrap"
+            [ngClass]="state.vehicle().turbo
+              ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
+              : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+            (click)="state.patchVehicle({ turbo: !state.vehicle().turbo })">
+            <i class="pi pi-bolt text-[0.75rem] mr-1"></i>Turbo
+          </button>
+        </div>
+      </div>
+    }
   </div>
 
   <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
@@ -157,22 +185,98 @@
     </div>
   </div>
 
-  <div class="flex flex-col gap-[5px]">
-    <label
-      class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
-      Odómetro al comprar (km)
-      <app-info-tip
-        text="Kilómetros que tenía el auto cuando lo compraste. Escribe 0 si lo compraste nuevo. Afecta qué mantenimientos aplican desde el inicio." />
-    </label>
-    <p-inputnumber [ngModel]="state.vehicle().purchaseKm"
-      (ngModelChange)="state.patchVehicle({ purchaseKm: $event ?? 0 })"
-      [min]="0" [step]="1000" [useGrouping]="false"
-      inputStyleClass="input-field"
-      placeholder="0 = auto nuevo" />
-    @if (state.vehicle().purchaseKm > 0) {
-      <span class="text-[0.72rem] text-[var(--muted)]">
-        <i class="pi pi-info-circle mr-1"></i>Auto comprado usado · el cálculo de mantenimientos parte desde {{ state.vehicle().purchaseKm | number }} km
-      </span>
+  <div class="flex flex-col gap-2">
+    <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
+      <div class="flex flex-col gap-[5px]">
+        <label
+          class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+          Odómetro al comprar (km)
+          <app-info-tip
+            text="Kilómetros que tenía el auto cuando lo compraste. Escribe 0 si lo compraste nuevo. Afecta qué mantenimientos aplican desde el inicio." />
+        </label>
+        <p-inputnumber [ngModel]="state.vehicle().purchaseKm"
+          (ngModelChange)="state.patchVehicle({ purchaseKm: $event ?? 0 })"
+          [min]="0" [step]="1000" [useGrouping]="false"
+          inputStyleClass="input-field"
+          placeholder="0 = auto nuevo" />
+      </div>
+      <div class="flex flex-col gap-[5px]">
+        <label
+          class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+          Odómetro actual (km)
+          <app-info-tip
+            text="Kilómetros actuales del odómetro. Con el km de compra y el año, se estima tu km anual real." />
+        </label>
+        <p-inputnumber [ngModel]="state.vehicle().currentKm"
+          (ngModelChange)="state.patchVehicle({ currentKm: $event ?? 0 })"
+          [min]="0" [step]="1000" [useGrouping]="false"
+          inputStyleClass="input-field"
+          placeholder="Km en el odómetro hoy" />
+      </div>
+    </div>
+    @if (suggestedAnnualKm(); as suggested) {
+      <div class="flex items-center gap-2 bg-[var(--surface2)] border border-[var(--border2)] py-2 px-3 text-[0.76rem] text-[var(--muted)]">
+        <i class="pi pi-calculator text-[0.78rem] text-[var(--primary)]"></i>
+        <span>Km/año estimado: <b class="text-[var(--text)]">~{{ suggested | number:'1.0-0' }} km/año</b></span>
+        <button
+          type="button"
+          class="ml-auto px-3 py-[3px] bg-[var(--primary)] text-white text-[0.72rem] font-semibold cursor-pointer border-0"
+          (click)="state.patchVehicle({ annualKm: suggested })">
+          Usar
+        </button>
+      </div>
+    }
+  </div>
+
+  <div class="grid gap-3"
+       [ngClass]="state.isElectric() ? 'grid-cols-1' : 'grid-cols-2'">
+    <div class="flex flex-col gap-[5px]">
+      <label class="text-[0.78rem] text-[var(--muted)] font-medium">Tipo de propulsión</label>
+      <div class="grid grid-cols-2 gap-[6px]">
+        <button
+          class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
+          [ngClass]="!state.vehicle().isElectric
+            ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
+            : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+          (click)="state.setElectric(false)">
+          <i class="pi pi-gauge text-[0.9rem]"></i>
+          <span>Combustión</span>
+        </button>
+        <button
+          class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
+          [ngClass]="state.vehicle().isElectric
+            ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
+            : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+          (click)="state.setElectric(true)">
+          <i class="pi pi-bolt text-[0.9rem]"></i>
+          <span>Eléctrico</span>
+        </button>
+      </div>
+    </div>
+    @if (!state.isElectric()) {
+      <div class="flex flex-col gap-[5px]">
+        <label class="text-[0.78rem] text-[var(--muted)] font-medium">Transmisión</label>
+        <div class="grid grid-cols-2 gap-[6px]">
+          <button
+            class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
+            [ngClass]="state.vehicle().transmission === 'manual'
+              ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
+              : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+            (click)="state.setTransmission('manual')">
+            <i class="pi pi-cog text-[0.9rem]"></i>
+            <span>Manual</span>
+          </button>
+          <button
+            class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
+            [ngClass]="state.vehicle().transmission === 'automatic'
+              ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
+              : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+            (click)="state.setTransmission('automatic')">
+            <i class="pi pi-cog text-[0.9rem]"></i>
+            <span>Automático</span>
+          </button>
+        </div>
+      </div>
     }
   </div>
 

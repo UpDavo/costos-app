@@ -6,6 +6,7 @@ import {
   IdleData,
   MaintenanceItem,
   ObligationsData,
+  Transmission,
   VehicleData,
 } from '../models/calculator.model';
 import { CostCalculationService, FUEL_DATA } from './cost-calculation.service';
@@ -34,15 +35,25 @@ const DEFAULT_MAINTENANCE: MaintenanceItem[] = [
 const DEFAULT_VEHICLE: VehicleData = {
   purchasePrice: 22000,
   vehicleYear: 2022,
+  engineDisplacement: '',
+  turbo: false,
+  isElectric: false,
+  transmission: 'manual',
   vehicleValue: 18000,
   residualValue: 4000,
   purchaseKm: 0,
+  currentKm: 0,
   annualKm: 20000,
   usefulLife: 8,
   deprMethod: 'accel',
 };
 
-const DEFAULT_FUEL: FuelData = { type: 'extra', unit: 'kmL', rendimiento: 12, pricePerGal: 3.164 };
+const DEFAULT_FUEL: FuelData = {
+  type: 'extra', unit: 'kmL', rendimiento: 12, pricePerGal: 3.164,
+  consumptionKwh: 18, pricePerKwh: 0.10,
+};
+
+const ELECTRIC_DISABLED_IDS = new Set([0, 1, 2, 6, 7, 8]);
 const DEFAULT_IDLE: IdleData = { enabled: true, lph: 0.8, hours: 250 };
 const DEFAULT_OBLIGATIONS: ObligationsData = {
   matricula: 120, soat: 80, seguroPrivado: 400, revisionTecnica: 35, parking: 60,
@@ -129,6 +140,36 @@ export class CalculatorStateService {
   depreciationCurve = computed(() => this.calc.buildDepreciationCurve(this.vehicle()));
   fuelLabel = computed(() => this.calc.fuelEquivalentLabel(this.fuel()));
 
+  // Global display computed — inject anywhere, no need to dig into vehicle()
+  isElectric      = computed(() => this.vehicle().isElectric);
+  transmission    = computed(() => this.vehicle().transmission);
+  energyUnitLabel = computed(() => this.vehicle().isElectric ? 'kWh' : 'litro');
+  energyUnitGalon = computed(() => this.vehicle().isElectric ? 'kWh' : 'galón');
+  consumptionUnit = computed(() => this.vehicle().isElectric ? 'kWh/100km' : 'km/L');
+  fuelSectionTitle = computed(() => this.vehicle().isElectric ? 'Energía' : 'Combustible');
+
+  vehicleTypeLabel = computed(() => {
+    const v = this.vehicle();
+    if (v.isElectric) return 'Eléctrico';
+    const parts: string[] = [];
+    if (v.engineDisplacement) parts.push(`${v.engineDisplacement}L`);
+    if (v.turbo) parts.push('Turbo');
+    return parts.length ? parts.join(' ') : 'Combustión';
+  });
+
+  vehicleSpecsBadge = computed(() => {
+    const v = this.vehicle();
+    const parts: string[] = [];
+    if (v.isElectric) { parts.push('⚡ Eléctrico'); }
+    else {
+      if (v.engineDisplacement) parts.push(`${v.engineDisplacement}L`);
+      if (v.turbo) parts.push('Turbo');
+    }
+    parts.push(v.transmission === 'manual' ? 'Manual' : 'Automático');
+    if (v.purchaseKm > 0) parts.push(`${v.purchaseKm.toLocaleString()} km (usado)`);
+    return parts.join(' · ');
+  });
+
   patchVehicle(patch: Partial<VehicleData>) {
     this.vehicle.update((v) => ({ ...v, ...patch }));
   }
@@ -146,7 +187,8 @@ export class CalculatorStateService {
   }
 
   setFuelType(type: FuelType, preset?: FuelPreset) {
-    const d = preset ?? FUEL_DATA[type];
+    if (type === 'electric') { this.fuel.update((f) => ({ ...f, type })); return; }
+    const d = preset ?? FUEL_DATA[type as keyof typeof FUEL_DATA];
     const unit = this.fuel().unit;
     this.fuel.update((f) => ({
       ...f,
@@ -157,7 +199,9 @@ export class CalculatorStateService {
   }
 
   setFuelUnit(unit: 'kmL' | 'kmG') {
-    const d = FUEL_DATA[this.fuel().type];
+    const currentType = this.fuel().type;
+    if (currentType === 'electric') { this.fuel.update((f) => ({ ...f, unit })); return; }
+    const d = FUEL_DATA[currentType as keyof typeof FUEL_DATA];
     this.fuel.update((f) => ({
       ...f,
       unit,
@@ -186,6 +230,34 @@ export class CalculatorStateService {
   addMaintenanceItem(name: string, cost: number, every: number) {
     const newItem: MaintenanceItem = { id: this.nextId++, name, cost, every, enabled: true };
     this.maintenanceItems.update((items) => [...items, newItem]);
+  }
+
+  setElectric(isElectric: boolean): void {
+    this.vehicle.update((v) => ({ ...v, isElectric, ...(isElectric ? { transmission: 'automatic' as const, engineDisplacement: '', turbo: false } : {}) }));
+    if (isElectric) {
+      this.fuel.update((f) => ({ ...f, type: 'electric' as FuelType }));
+      this.maintenanceItems.update((items) =>
+        items.map((i) => ELECTRIC_DISABLED_IDS.has(i.id) ? { ...i, enabled: false } : i)
+      );
+    } else {
+      this.fuel.update((f) => ({ ...f, type: 'extra' as FuelType }));
+      this.maintenanceItems.update((items) =>
+        items.map((i) =>
+          ELECTRIC_DISABLED_IDS.has(i.id)
+            ? { ...i, enabled: this.vehicle().transmission === 'manual' || i.id !== 6 }
+            : i
+        )
+      );
+    }
+  }
+
+  setTransmission(transmission: Transmission): void {
+    this.vehicle.update((v) => ({ ...v, transmission }));
+    if (!this.vehicle().isElectric) {
+      this.maintenanceItems.update((items) =>
+        items.map((i) => i.id === 6 ? { ...i, enabled: transmission === 'manual' } : i)
+      );
+    }
   }
 
   reset() {

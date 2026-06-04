@@ -37,6 +37,13 @@ export class VehicleCardComponent {
     return (((v.purchasePrice - v.vehicleValue) / v.purchasePrice) * 100).toFixed(1);
   });
 
+  suggestedAnnualKm = computed((): number | null => {
+    const v = this.state.vehicle();
+    if (v.currentKm <= v.purchaseKm) return null;
+    const elapsed = Math.max(CURRENT_YEAR - v.vehicleYear, 0.5);
+    return Math.round((v.currentKm - v.purchaseKm) / elapsed);
+  });
+
   async searchVehicle() {
     const query = this.state.vehicleLookupQuery().trim();
     if (!query || this.isLookingUp()) return;

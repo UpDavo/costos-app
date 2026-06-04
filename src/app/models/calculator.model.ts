@@ -1,13 +1,19 @@
-export type FuelType = 'extra' | 'super' | 'diesel';
+export type FuelType = 'extra' | 'super' | 'diesel' | 'electric';
 export type FuelUnit = 'kmL' | 'kmG';
 export type DeprMethod = 'accel' | 'linear';
+export type Transmission = 'manual' | 'automatic';
 
 export interface VehicleData {
   purchasePrice: number;
   vehicleYear: number;
+  engineDisplacement: string;
+  turbo: boolean;
+  isElectric: boolean;
+  transmission: Transmission;
   vehicleValue: number;
   residualValue: number;
   purchaseKm: number;
+  currentKm: number;
   annualKm: number;
   usefulLife: number;
   deprMethod: DeprMethod;
@@ -18,6 +24,8 @@ export interface FuelData {
   unit: FuelUnit;
   rendimiento: number;
   pricePerGal: number;
+  consumptionKwh: number;
+  pricePerKwh: number;
 }
 
 export interface IdleData {
