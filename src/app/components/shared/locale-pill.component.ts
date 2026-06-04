@@ -7,80 +7,38 @@ import { CalculatorStateService } from '../../services/calculator-state.service'
   selector: 'app-locale-pill',
   imports: [CommonModule],
   template: `
-    <div class="locale-pill">
-      <span class="locale-pill__segment">
-        <i class="pi pi-map-marker"></i>
+    <div class="fixed bottom-5 right-5 z-[1000] flex items-center
+                bg-white border-[1.5px] border-[#c8d9d1] rounded-full
+                py-[6px] px-[14px]
+                shadow-[0_2px_8px_rgba(45,106,79,0.12),0_1px_3px_rgba(0,0,0,0.08)]
+                text-[0.75rem] font-semibold text-[#2d6a4f] tracking-[0.02em] select-none">
+
+      <span class="flex items-center gap-[5px]">
+        <i class="pi pi-map-marker text-[0.7rem] opacity-75"></i>
         {{ appStore.selectedCountry().name }}
       </span>
-      <span class="locale-pill__divider"></span>
-      <span class="locale-pill__segment">
-        <i class="pi pi-wallet"></i>
+
+      <span class="w-px h-3 bg-[#c8d9d1] mx-[10px]"></span>
+
+      <span class="flex items-center gap-[5px]">
+        <i class="pi pi-wallet text-[0.7rem] opacity-75"></i>
         {{ appStore.selectedCountry().currency }}
       </span>
-      <span class="locale-pill__divider"></span>
-      <span class="locale-pill__segment locale-pill__save"
-            [class.locale-pill__save--saving]="state.saveStatus() === 'saving'">
+
+      <span class="w-px h-3 bg-[#c8d9d1] mx-[10px]"></span>
+
+      <span class="flex items-center gap-[5px] transition-colors duration-200"
+            [class]="state.saveStatus() === 'saving' ? 'text-[#9ca3af]' : 'text-[#52b788]'">
         @if (state.saveStatus() === 'saving') {
-          <i class="pi pi-spin pi-spinner"></i>
+          <i class="pi pi-spin pi-spinner text-[0.7rem]"></i>
           <span>Guardando</span>
         } @else {
-          <i class="pi pi-check-circle"></i>
+          <i class="pi pi-check-circle text-[0.7rem]"></i>
           <span>Guardado</span>
         }
       </span>
     </div>
   `,
-  styles: [`
-    .locale-pill {
-      position: fixed;
-      bottom: 1.25rem;
-      right: 1.25rem;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      background: #fff;
-      border: 1.5px solid #c8d9d1;
-      border-radius: 999px;
-      padding: 6px 14px;
-      box-shadow: 0 2px 8px rgba(45,106,79,0.12), 0 1px 3px rgba(0,0,0,0.08);
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #2d6a4f;
-      letter-spacing: 0.02em;
-      user-select: none;
-    }
-
-    .locale-pill__segment {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .locale-pill__segment i {
-      font-size: 0.7rem;
-      opacity: 0.75;
-    }
-
-    .locale-pill__divider {
-      width: 1px;
-      height: 12px;
-      background: #c8d9d1;
-      margin: 0 10px;
-    }
-
-    .locale-pill__save {
-      color: #52b788;
-      transition: color 0.2s;
-    }
-
-    .locale-pill__save--saving {
-      color: #9ca3af;
-    }
-
-    .locale-pill__save i {
-      opacity: 1;
-    }
-  `],
 })
 export class LocalePillComponent {
   appStore = inject(AppStore);

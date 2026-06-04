@@ -19,16 +19,16 @@ import { LocalePillComponent } from './components/shared/locale-pill.component';
     LocalePillComponent,
   ],
   template: `
-    <div class="app-shell">
+    <div class="min-h-screen bg-[var(--bg)] overflow-x-hidden font-sans">
       <app-hero />
-      <div class="main-layout">
-        <div class="left-panel">
+      <div class="grid grid-cols-1 min-[901px]:grid-cols-[1fr_550px] gap-6 items-start py-6 px-4 min-[901px]:py-8 min-[901px]:px-8">
+        <div>
           <app-vehicle-card />
           <app-fuel-card />
           <app-obligations-card />
           <app-maintenance-card />
         </div>
-        <div class="right-panel">
+        <div class="min-[901px]:sticky min-[901px]:top-6">
           <app-result-panel />
         </div>
       </div>
@@ -36,31 +36,5 @@ import { LocalePillComponent } from './components/shared/locale-pill.component';
     </div>
     <app-locale-pill />
   `,
-  styles: [`
-    .app-shell {
-      min-height: 100vh;
-      background: var(--bg, #f2f4f3);
-      font-family: 'Roboto', sans-serif;
-      overflow-x: hidden;
-    }
-    .main-layout {
-      padding: 1.5rem 1rem;
-      display: grid;
-      grid-template-columns: 1fr 400px;
-      gap: 1.5rem;
-      align-items: start;
-    }
-    .right-panel {
-      position: sticky;
-      top: 1.5rem;
-    }
-    @media (min-width: 901px) {
-      .main-layout { padding: 2rem 2rem; }
-    }
-    @media (max-width: 900px) {
-      .main-layout { grid-template-columns: 1fr; }
-      .right-panel { position: static; }
-    }
-  `],
 })
 export class App { }
