@@ -109,8 +109,8 @@ export class CalculatorStateService {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       const saved = JSON.parse(raw);
-      if (saved.vehicle) this.vehicle.set(saved.vehicle);
-      if (saved.fuel) this.fuel.set(saved.fuel);
+      if (saved.vehicle) this.vehicle.set({ ...DEFAULT_VEHICLE, ...saved.vehicle });
+      if (saved.fuel) this.fuel.set({ ...DEFAULT_FUEL, ...saved.fuel });
       if (saved.idle) this.idle.set(saved.idle);
       if (saved.obligations) this.obligations.set(saved.obligations);
       if (saved.vehicleLookupQuery) this.vehicleLookupQuery.set(saved.vehicleLookupQuery);
