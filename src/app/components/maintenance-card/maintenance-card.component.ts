@@ -7,11 +7,10 @@ import { ButtonModule } from 'primeng/button';
 import { CalculatorStateService } from '../../services/calculator-state.service';
 import { AppStore } from '../../store/app.store';
 import { MaintenanceItemComponent } from './maintenance-item/maintenance-item.component';
-import { InfoTooltipComponent } from '../shared/info-tooltip.component';
 
 @Component({
   selector: 'app-maintenance-card',
-  imports: [FormsModule, InputNumberModule, InputTextModule, DialogModule, ButtonModule, MaintenanceItemComponent, InfoTooltipComponent],
+  imports: [FormsModule, InputNumberModule, InputTextModule, DialogModule, ButtonModule, MaintenanceItemComponent],
   templateUrl: './maintenance-card.component.html',
 })
 export class MaintenanceCardComponent {

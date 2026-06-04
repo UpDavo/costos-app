@@ -6,6 +6,8 @@ import { ObligationsCardComponent } from './components/obligations-card/obligati
 import { MaintenanceCardComponent } from './components/maintenance-card/maintenance-card.component';
 import { ResultPanelComponent } from './components/result-panel/result-panel.component';
 import { LocalePillComponent } from './components/shared/locale-pill.component';
+import { AccordionGroupComponent } from './components/shared/accordion-group.component';
+import { AccordionItemComponent } from './components/shared/accordion-item.component';
 
 @Component({
   selector: 'app-root',
@@ -17,16 +19,29 @@ import { LocalePillComponent } from './components/shared/locale-pill.component';
     MaintenanceCardComponent,
     ResultPanelComponent,
     LocalePillComponent,
+    AccordionGroupComponent,
+    AccordionItemComponent,
   ],
   template: `
     <div class="min-h-screen bg-[var(--bg)] overflow-x-hidden font-sans">
       <app-hero />
       <div class="grid grid-cols-1 min-[901px]:grid-cols-[1fr_550px] gap-6 items-start py-6 px-4 min-[901px]:py-8 min-[901px]:px-8">
         <div>
-          <app-vehicle-card />
-          <app-fuel-card />
-          <app-obligations-card />
-          <app-maintenance-card />
+          <app-accordion-group>
+            <app-accordion-item [index]="0" title="Datos del vehículo" icon="pi-car">
+              <app-vehicle-card />
+            </app-accordion-item>
+            <app-accordion-item [index]="1" title="Combustible" icon="pi-bolt">
+              <app-fuel-card />
+            </app-accordion-item>
+            <app-accordion-item [index]="2" title="Obligaciones anuales" icon="pi-shield">
+              <app-obligations-card />
+            </app-accordion-item>
+            <app-accordion-item [index]="3" title="Mantenimiento y piezas" icon="pi-wrench"
+              tip="Valores de referencia del mercado ecuatoriano 2026. Ajusta segun tu mecanico. Desactiva los items que no apliquen (ej: embrague en automatico).">
+              <app-maintenance-card />
+            </app-accordion-item>
+          </app-accordion-group>
         </div>
         <div class="min-[901px]:sticky min-[901px]:top-6">
           <app-result-panel />
