@@ -1,4 +1,5 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, PLATFORM_ID, signal, untracked } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import {
   FuelData,
   FuelType,
@@ -8,6 +9,8 @@ import {
   VehicleData,
 } from '../models/calculator.model';
 import { CostCalculationService, FUEL_DATA } from './cost-calculation.service';
+
+const STORAGE_KEY = 'costos-app-state';
 
 const DEFAULT_MAINTENANCE: MaintenanceItem[] = [
   { id: 0, name: 'Cambio de aceite y filtro', cost: 35, every: 5000, enabled: true },
@@ -26,43 +29,83 @@ const DEFAULT_MAINTENANCE: MaintenanceItem[] = [
   { id: 13, name: 'Líquido de frenos', cost: 15, every: 30000, enabled: true },
 ];
 
+const DEFAULT_VEHICLE: VehicleData = {
+  purchasePrice: 22000,
+  vehicleYear: 2022,
+  vehicleValue: 18000,
+  residualValue: 4000,
+  annualKm: 20000,
+  usefulLife: 8,
+  deprMethod: 'accel',
+};
+
+const DEFAULT_FUEL: FuelData = { type: 'extra', unit: 'kmL', rendimiento: 12, pricePerGal: 3.164 };
+const DEFAULT_IDLE: IdleData = { enabled: true, lph: 0.8, hours: 250 };
+const DEFAULT_OBLIGATIONS: ObligationsData = {
+  matricula: 120, soat: 80, seguroPrivado: 400, revisionTecnica: 35, parking: 60,
+};
+
 @Injectable({ providedIn: 'root' })
 export class CalculatorStateService {
   private calc = inject(CostCalculationService);
+  private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private nextId = 14;
+  private saveTimer: ReturnType<typeof setTimeout> | null = null;
 
-  vehicle = signal<VehicleData>({
-    purchasePrice: 22000,
-    vehicleYear: 2022,
-    vehicleValue: 18000,
-    residualValue: 4000,
-    annualKm: 20000,
-    usefulLife: 8,
-    deprMethod: 'accel',
-  });
+  saveStatus = signal<'saved' | 'saving'>('saved');
 
-  fuel = signal<FuelData>({
-    type: 'extra',
-    unit: 'kmL',
-    rendimiento: 12,
-    pricePerGal: 3.164,
-  });
-
-  idle = signal<IdleData>({
-    enabled: true,
-    lph: 0.8,
-    hours: 250,
-  });
-
-  obligations = signal<ObligationsData>({
-    matricula: 120,
-    soat: 80,
-    seguroPrivado: 400,
-    revisionTecnica: 35,
-    parking: 60,
-  });
-
+  vehicle = signal<VehicleData>({ ...DEFAULT_VEHICLE });
+  fuel = signal<FuelData>({ ...DEFAULT_FUEL });
+  idle = signal<IdleData>({ ...DEFAULT_IDLE });
+  obligations = signal<ObligationsData>({ ...DEFAULT_OBLIGATIONS });
   maintenanceItems = signal<MaintenanceItem[]>([...DEFAULT_MAINTENANCE]);
+
+  constructor() {
+    this.loadFromStorage();
+
+    effect(() => {
+      const snapshot = {
+        vehicle: this.vehicle(),
+        fuel: this.fuel(),
+        idle: this.idle(),
+        obligations: this.obligations(),
+        maintenanceItems: this.maintenanceItems(),
+      };
+
+      untracked(() => {
+        this.saveStatus.set('saving');
+        if (this.saveTimer) clearTimeout(this.saveTimer);
+        this.saveTimer = setTimeout(() => {
+          if (this.isBrowser) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+          }
+          this.saveStatus.set('saved');
+        }, 800);
+      });
+    });
+  }
+
+  private loadFromStorage(): void {
+    if (!this.isBrowser) return;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (saved.vehicle) this.vehicle.set(saved.vehicle);
+      if (saved.fuel) this.fuel.set(saved.fuel);
+      if (saved.idle) this.idle.set(saved.idle);
+      if (saved.obligations) this.obligations.set(saved.obligations);
+      if (saved.maintenanceItems) {
+        this.maintenanceItems.set(saved.maintenanceItems);
+        const maxId = (saved.maintenanceItems as MaintenanceItem[]).reduce(
+          (m: number, i: MaintenanceItem) => Math.max(m, i.id), 13
+        );
+        this.nextId = maxId + 1;
+      }
+    } catch {
+      // corrupted storage — ignore, use defaults
+    }
+  }
 
   result = computed(() =>
     this.calc.calculate(
@@ -75,7 +118,6 @@ export class CalculatorStateService {
   );
 
   depreciationCurve = computed(() => this.calc.buildDepreciationCurve(this.vehicle()));
-
   fuelLabel = computed(() => this.calc.fuelEquivalentLabel(this.fuel()));
 
   patchVehicle(patch: Partial<VehicleData>) {
@@ -125,36 +167,20 @@ export class CalculatorStateService {
   }
 
   addMaintenanceItem(name: string, cost: number, every: number) {
-    const newItem: MaintenanceItem = {
-      id: this.nextId++,
-      name,
-      cost,
-      every,
-      enabled: true,
-    };
+    const newItem: MaintenanceItem = { id: this.nextId++, name, cost, every, enabled: true };
     this.maintenanceItems.update((items) => [...items, newItem]);
   }
 
   reset() {
-    this.vehicle.set({
-      purchasePrice: 22000,
-      vehicleYear: 2022,
-      vehicleValue: 18000,
-      residualValue: 4000,
-      annualKm: 20000,
-      usefulLife: 8,
-      deprMethod: 'accel',
-    });
-    this.fuel.set({ type: 'extra', unit: 'kmL', rendimiento: 12, pricePerGal: 3.164 });
-    this.idle.set({ enabled: true, lph: 0.8, hours: 250 });
-    this.obligations.set({
-      matricula: 120,
-      soat: 80,
-      seguroPrivado: 400,
-      revisionTecnica: 35,
-      parking: 60,
-    });
+    this.vehicle.set({ ...DEFAULT_VEHICLE });
+    this.fuel.set({ ...DEFAULT_FUEL });
+    this.idle.set({ ...DEFAULT_IDLE });
+    this.obligations.set({ ...DEFAULT_OBLIGATIONS });
     this.maintenanceItems.set([...DEFAULT_MAINTENANCE]);
     this.nextId = 14;
+    if (this.isBrowser) {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+    this.saveStatus.set('saved');
   }
 }

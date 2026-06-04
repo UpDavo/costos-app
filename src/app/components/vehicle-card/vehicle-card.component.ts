@@ -15,6 +15,11 @@ export class VehicleCardComponent {
   state = inject(CalculatorStateService);
   appStore = inject(AppStore);
 
+  readonly yearOptions: number[] = Array.from(
+    { length: CURRENT_YEAR + 1 - 1990 + 1 },
+    (_, i) => CURRENT_YEAR + 1 - i
+  );
+
   ageLabel = computed(() => {
     const age = CURRENT_YEAR - this.state.vehicle().vehicleYear;
     if (age <= 0) return 'este año';

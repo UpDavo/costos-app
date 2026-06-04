@@ -41,13 +41,12 @@ import { LocalePillComponent } from './components/shared/locale-pill.component';
       min-height: 100vh;
       background: var(--bg, #f2f4f3);
       font-family: 'Roboto', sans-serif;
+      overflow-x: hidden;
     }
     .main-layout {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem;
+      padding: 1.5rem 1rem;
       display: grid;
-      grid-template-columns: 1fr 380px;
+      grid-template-columns: 1fr 400px;
       gap: 1.5rem;
       align-items: start;
     }
@@ -55,10 +54,13 @@ import { LocalePillComponent } from './components/shared/locale-pill.component';
       position: sticky;
       top: 1.5rem;
     }
+    @media (min-width: 901px) {
+      .main-layout { padding: 2rem 2rem; }
+    }
     @media (max-width: 900px) {
       .main-layout { grid-template-columns: 1fr; }
       .right-panel { position: static; }
     }
   `],
 })
-export class App {}
+export class App { }

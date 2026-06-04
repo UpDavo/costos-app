@@ -26,15 +26,25 @@
 
 * { box-sizing: border-box; }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+body {
   background: var(--bg);
   color: var(--text);
   font-family: 'Roboto', sans-serif;
 }
 
 /* ── PrimeNG input overrides ── */
+.p-inputnumber {
+  width: 100% !important;
+  display: block !important;
+}
+
 .p-inputtext,
 .p-inputnumber-input,
 .input-field {

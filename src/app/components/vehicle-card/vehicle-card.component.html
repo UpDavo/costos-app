@@ -27,10 +27,17 @@
         <app-info-tip
           text="Año en que compraste o se fabricó el auto. Se usa para calcular cuánto ha perdido de valor hasta hoy." />
       </label>
-      <p-inputnumber [ngModel]="state.vehicle().vehicleYear"
-        (ngModelChange)="state.patchVehicle({ vehicleYear: $event ?? 2022 })"
-        [min]="1990" [max]="2026" [step]="1" [useGrouping]="false"
-        inputStyleClass="input-field" />
+      <div class="relative">
+        <select
+          [ngModel]="state.vehicle().vehicleYear"
+          (ngModelChange)="state.patchVehicle({ vehicleYear: +$event })"
+          class="w-full appearance-none bg-white border-[1.5px] border-[#d1d9d4] rounded-lg px-3 py-[8px] pr-8 text-[0.875rem] text-[#111827] font-normal cursor-pointer focus:outline-none focus:border-[#2d6a4f] focus:ring-1 focus:ring-[rgba(45,106,79,0.3)]">
+          @for (y of yearOptions; track y) {
+            <option [value]="y">{{ y }}</option>
+          }
+        </select>
+        <i class="pi pi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7280] text-[0.65rem] pointer-events-none"></i>
+      </div>
     </div>
   </div>
 

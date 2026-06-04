@@ -1,9 +1,11 @@
 import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { AppStore } from '../../store/app.store';
+import { CalculatorStateService } from '../../services/calculator-state.service';
 
 @Component({
   selector: 'app-locale-pill',
-  imports: [],
+  imports: [CommonModule],
   template: `
     <div class="locale-pill">
       <span class="locale-pill__segment">
@@ -15,6 +17,17 @@ import { AppStore } from '../../store/app.store';
         <i class="pi pi-wallet"></i>
         {{ appStore.selectedCountry().currency }}
       </span>
+      <span class="locale-pill__divider"></span>
+      <span class="locale-pill__segment locale-pill__save"
+            [class.locale-pill__save--saving]="state.saveStatus() === 'saving'">
+        @if (state.saveStatus() === 'saving') {
+          <i class="pi pi-spin pi-spinner"></i>
+          <span>Guardando</span>
+        } @else {
+          <i class="pi pi-check-circle"></i>
+          <span>Guardado</span>
+        }
+      </span>
     </div>
   `,
   styles: [`
@@ -25,7 +38,6 @@ import { AppStore } from '../../store/app.store';
       z-index: 1000;
       display: flex;
       align-items: center;
-      gap: 0;
       background: #fff;
       border: 1.5px solid #c8d9d1;
       border-radius: 999px;
@@ -55,8 +67,22 @@ import { AppStore } from '../../store/app.store';
       background: #c8d9d1;
       margin: 0 10px;
     }
+
+    .locale-pill__save {
+      color: #52b788;
+      transition: color 0.2s;
+    }
+
+    .locale-pill__save--saving {
+      color: #9ca3af;
+    }
+
+    .locale-pill__save i {
+      opacity: 1;
+    }
   `],
 })
 export class LocalePillComponent {
   appStore = inject(AppStore);
+  state = inject(CalculatorStateService);
 }
