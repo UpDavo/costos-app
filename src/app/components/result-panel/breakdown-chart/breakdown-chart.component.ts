@@ -23,11 +23,11 @@ export class BreakdownChartComponent {
   };
 
   private categories = [
-    { label: 'Combustible', color: '#2d6a4f' },
-    { label: 'Mantenimiento', color: '#52b788' },
-    { label: 'Depreciación', color: '#95d5b2' },
-    { label: 'Seguros', color: '#6b7280' },
-    { label: 'Parqueadero', color: '#d1d5db' },
+    { label: 'Combustible', color: '#443FE9' },
+    { label: 'Mantenimiento', color: '#6B67FF' },
+    { label: 'Depreciación', color: '#3b82f6' },
+    { label: 'Seguros', color: '#f59e0b' },
+    { label: 'Parqueadero', color: '#9ca3af' },
   ];
 
   private values = computed(() => {

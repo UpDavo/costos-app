@@ -1,27 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 @import "tailwindcss";
 @import "tailwindcss-primeui";
 @import "primeicons/primeicons.css";
 
 :root {
-  --bg: #f2f4f3;
+  --bg: #F4F4F0;
   --surface: #ffffff;
-  --surface2: #f8faf9;
-  --border: #e2e8e4;
-  --border2: #d1d9d4;
-  --text: #111827;
-  --muted: #6b7280;
-  --primary: #2d6a4f;
-  --primary-dark: #1b4332;
-  --primary-light: #52b788;
-  --primary-dim: rgba(45,106,79,0.08);
-  --primary-dim2: rgba(45,106,79,0.15);
+  --surface2: #F9F9F7;
+  --border: #E0E0D8;
+  --border2: #CACAC0;
+  --text: #0F0F0F;
+  --muted: #8A8A8A;
+  --primary: #443FE9;
+  --primary-dark: #0F0F0F;
+  --primary-light: #6B67FF;
+  --primary-dim: rgba(68,63,233,0.08);
+  --primary-dim2: rgba(68,63,233,0.15);
   --red: #dc2626;
   --red-dim: rgba(220,38,38,0.08);
   --blue: #2563eb;
   --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 6px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
-  --radius: 12px;
+  --radius: 0px;
 }
 
 * { box-sizing: border-box; }
@@ -36,7 +36,7 @@ html, body {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 /* ── PrimeNG input overrides ── */
@@ -50,9 +50,9 @@ body {
 .input-field {
   background: var(--surface) !important;
   border: 1.5px solid var(--border2) !important;
-  border-radius: 8px !important;
+  border-radius: 0 !important;
   color: var(--text) !important;
-  font-family: 'Roboto', sans-serif !important;
+  font-family: 'Space Grotesk', sans-serif !important;
   font-size: 0.875rem !important;
   padding: 8px 12px !important;
   width: 100% !important;
@@ -71,9 +71,9 @@ body {
 .input-field-sm {
   background: var(--surface) !important;
   border: 1.5px solid var(--border2) !important;
-  border-radius: 8px !important;
+  border-radius: 0 !important;
   color: var(--text) !important;
-  font-family: 'Roboto', sans-serif !important;
+  font-family: 'Space Grotesk', sans-serif !important;
   font-size: 0.8rem !important;
   padding: 6px 10px !important;
   width: 100% !important;
@@ -88,12 +88,12 @@ body {
 
 /* ── PrimeNG dialog ── */
 .p-dialog {
-  border-radius: var(--radius) !important;
+  border-radius: 0 !important;
   box-shadow: var(--shadow-md) !important;
 }
 .p-dialog .p-dialog-header {
   border-bottom: 1px solid var(--border) !important;
-  font-family: 'Roboto', sans-serif !important;
+  font-family: 'Space Grotesk', sans-serif !important;
   font-weight: 500 !important;
 }
 .p-dialog .p-dialog-footer {
@@ -120,10 +120,10 @@ body {
 .p-tooltip .p-tooltip-text {
   background: var(--primary-dark) !important;
   color: #fff !important;
-  font-family: 'Roboto', sans-serif !important;
-  font-size: 0.78rem !important;
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.72rem !important;
   line-height: 1.5 !important;
-  border-radius: 8px !important;
+  border-radius: 0 !important;
   padding: 8px 12px !important;
   max-width: 280px !important;
   box-shadow: var(--shadow-md) !important;
@@ -137,8 +137,9 @@ body {
 
 /* ── PrimeNG button ── */
 .p-button {
-  font-family: 'Roboto', sans-serif !important;
+  font-family: 'Space Grotesk', sans-serif !important;
   font-weight: 500 !important;
+  border-radius: 0 !important;
 }
 .p-button.p-button-primary,
 .p-button:not(.p-button-secondary):not(.p-button-danger):not(.p-button-text) {

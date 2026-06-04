@@ -55,9 +55,9 @@ export class DepreciationChartComponent {
         },
         {
           label: 'Proyección', data: futureData,
-          borderColor: '#2d6a4f', borderWidth: 2,
-          pointRadius: 3, pointBackgroundColor: '#2d6a4f',
-          backgroundColor: 'rgba(45,106,79,0.06)', fill: true,
+          borderColor: '#443FE9', borderWidth: 2,
+          pointRadius: 3, pointBackgroundColor: '#443FE9',
+          backgroundColor: 'rgba(68,63,233,0.06)', fill: true,
           tension: 0.3, spanGaps: false,
         },
       ],

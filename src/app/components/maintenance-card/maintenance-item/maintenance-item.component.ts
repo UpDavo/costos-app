@@ -2,13 +2,13 @@ import { Component, input, output, computed } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TooltipModule } from 'primeng/tooltip';
 import { MaintenanceItem } from '../../../models/calculator.model';
+import { ToggleComponent } from '../../shared/toggle.component';
 
 @Component({
   selector: 'app-maintenance-item',
-  imports: [CommonModule, DecimalPipe, FormsModule, InputNumberModule, ToggleSwitchModule, TooltipModule],
+  imports: [CommonModule, DecimalPipe, FormsModule, InputNumberModule, TooltipModule, ToggleComponent],
   templateUrl: './maintenance-item.component.html',
 })
 export class MaintenanceItemComponent {

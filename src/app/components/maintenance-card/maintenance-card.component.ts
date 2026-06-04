@@ -2,15 +2,13 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { DialogModule } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
 import { CalculatorStateService } from '../../services/calculator-state.service';
 import { AppStore } from '../../store/app.store';
 import { MaintenanceItemComponent } from './maintenance-item/maintenance-item.component';
 
 @Component({
   selector: 'app-maintenance-card',
-  imports: [FormsModule, InputNumberModule, InputTextModule, DialogModule, ButtonModule, MaintenanceItemComponent],
+  imports: [FormsModule, InputNumberModule, InputTextModule, MaintenanceItemComponent],
   templateUrl: './maintenance-card.component.html',
 })
 export class MaintenanceCardComponent {

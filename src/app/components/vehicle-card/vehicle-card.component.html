@@ -1,10 +1,10 @@
 <div
-  class="bg-white border border-[#e2e8e4] rounded-[12px] p-5 mb-4 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] flex flex-col gap-3">
+  class="p-5 flex flex-col gap-3">
 
   <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
     <div class="flex flex-col gap-[5px]">
       <label
-        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
         Precio de compra original ({{ appStore.selectedCountry().currency }})
         <app-info-tip
           text="Lo que pagaste al comprar el auto. Usa el precio original, no el valor actual de mercado." />
@@ -16,7 +16,7 @@
     </div>
     <div class="flex flex-col gap-[5px]">
       <label
-        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
         Año de compra / fabricación
         <app-info-tip
           text="Año en que compraste o se fabricó el auto. Se usa para calcular cuánto ha perdido de valor hasta hoy." />
@@ -25,12 +25,12 @@
         <select
           [ngModel]="state.vehicle().vehicleYear"
           (ngModelChange)="state.patchVehicle({ vehicleYear: +$event })"
-          class="w-full appearance-none bg-white border-[1.5px] border-[#d1d9d4] rounded-lg px-3 py-[8px] pr-8 text-[0.875rem] text-[#111827] font-normal cursor-pointer focus:outline-none focus:border-[#2d6a4f] focus:ring-1 focus:ring-[rgba(45,106,79,0.3)]">
+          class="w-full appearance-none bg-white border-[1.5px] border-[var(--border2)] px-3 py-[8px] pr-8 text-[0.875rem] text-[var(--text)] font-normal cursor-pointer focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary-dim)]">
           @for (y of yearOptions; track y) {
             <option [value]="y">{{ y }}</option>
           }
         </select>
-        <i class="pi pi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7280] text-[0.65rem] pointer-events-none"></i>
+        <i class="pi pi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted)] text-[0.65rem] pointer-events-none"></i>
       </div>
     </div>
   </div>
@@ -38,7 +38,7 @@
   <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
     <div class="flex flex-col gap-[5px]">
       <label
-        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
         Valor actual del auto ({{ appStore.selectedCountry().currency }})
         <app-info-tip
           text="Precio al que podrías vender el auto HOY. Consulta Patiotuerca u OLX para referencias de tu modelo y año." />
@@ -50,7 +50,7 @@
     </div>
     <div class="flex flex-col gap-[5px]">
       <label
-        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
         Valor residual estimado ({{ appStore.selectedCountry().currency }})
         <app-info-tip
           text="Cuánto esperas recibir al venderlo al final. Regla: 10–15% del precio original para autos de 10+ años. Busca tu modelo en Patiotuerca con más años." />
@@ -65,7 +65,7 @@
   <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
     <div class="flex flex-col gap-[5px]">
       <label
-        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
         Kilómetros anuales recorridos
         <app-info-tip
           text="Km que recorres en un año típico. Tip: revisa el odómetro en enero y diciembre. Promedio Ecuador: 15,000–25,000 km/año." />
@@ -77,7 +77,7 @@
     </div>
     <div class="flex flex-col gap-[5px]">
       <label
-        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
         Años de vida útil restantes
         <app-info-tip
           text="Años que planeas usar el auto antes de venderlo. Afecta directamente el costo de depreciación por km." />
@@ -91,17 +91,17 @@
 
   <div class="flex flex-col gap-[5px]">
     <label
-      class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+      class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
       Método de depreciación
       <app-info-tip
         text="Acelerada: los autos pierden más valor los primeros años (realidad del mercado ecuatoriano). Lineal: pérdida uniforme. Usa Acelerada para autos nuevos." />
     </label>
     <div class="grid grid-cols-2 gap-[6px]">
       <button
-        class="flex flex-col items-center gap-[3px] py-[10px] px-2 rounded-lg border-[1.5px] text-[0.8rem] font-medium cursor-pointer transition-all duration-150 text-center"
+        class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.8rem] font-medium cursor-pointer transition-all duration-150 text-center"
         [ngClass]="state.vehicle().deprMethod === 'accel'
-                ? 'bg-[rgba(45,106,79,0.08)] border-[#2d6a4f] text-[#2d6a4f]'
-                : 'border-[#d1d9d4] bg-[#f8faf9] text-[#6b7280]'"
+                ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
+                : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
         (click)="state.patchVehicle({ deprMethod: 'accel' })">
         <i class="pi pi-chart-line text-[0.9rem]"></i>
         <span>Acelerada</span>
@@ -109,10 +109,10 @@
           nuevos</small>
       </button>
       <button
-        class="flex flex-col items-center gap-[3px] py-[10px] px-2 rounded-lg border-[1.5px] text-[0.8rem] font-medium cursor-pointer transition-all duration-150 text-center"
+        class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.8rem] font-medium cursor-pointer transition-all duration-150 text-center"
         [ngClass]="state.vehicle().deprMethod === 'linear'
-                ? 'bg-[rgba(45,106,79,0.08)] border-[#2d6a4f] text-[#2d6a4f]'
-                : 'border-[#d1d9d4] bg-[#f8faf9] text-[#6b7280]'"
+                ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
+                : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
         (click)="state.patchVehicle({ deprMethod: 'linear' })">
         <i class="pi pi-minus text-[0.9rem]"></i>
         <span>Lineal</span>
@@ -123,7 +123,7 @@
   </div>
 
   <div
-    class="flex items-center gap-2 bg-[rgba(45,106,79,0.08)] border border-[rgba(45,106,79,0.15)] rounded-lg py-2 px-3 text-[0.78rem] text-[#2d6a4f]">
+    class="flex items-center gap-2 bg-[var(--primary-dim)] border border-[var(--primary-dim2)] py-2 px-3 text-[0.78rem] text-[var(--primary)]">
     <i class="pi pi-tag text-[0.8rem] opacity-70"></i>
     <span>
       En {{ ageLabel() }}: <b>{{ state.vehicle().purchasePrice |
@@ -133,7 +133,7 @@
         }}</b>
     </span>
     <span
-      class="ml-auto flex items-center gap-1 bg-[rgba(220,38,38,0.08)] text-[#dc2626] py-[2px] px-2 rounded-[12px] text-[0.72rem] font-medium">
+      class="ml-auto flex items-center gap-1 bg-[var(--red-dim)] text-[var(--red)] py-[2px] px-2 text-[0.72rem] font-medium">
       <i class="pi pi-arrow-down text-[0.6rem]"></i>
       {{ state.vehicle().purchasePrice - state.vehicle().vehicleValue |
       currency:appStore.selectedCountry().currency:'symbol':'1.0-0' }}

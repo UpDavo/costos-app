@@ -8,6 +8,7 @@ import { ResultPanelComponent } from './components/result-panel/result-panel.com
 import { LocalePillComponent } from './components/shared/locale-pill.component';
 import { AccordionGroupComponent } from './components/shared/accordion-group.component';
 import { AccordionItemComponent } from './components/shared/accordion-item.component';
+import { FooterComponent } from './components/footer/footer.component';
 
 @Component({
   selector: 'app-root',
@@ -21,9 +22,10 @@ import { AccordionItemComponent } from './components/shared/accordion-item.compo
     LocalePillComponent,
     AccordionGroupComponent,
     AccordionItemComponent,
+    FooterComponent,
   ],
   template: `
-    <div class="min-h-screen bg-[var(--bg)] overflow-x-hidden font-sans">
+    <div class="min-h-screen bg-[var(--bg)] overflow-x-hidden font-sans flex flex-col">
       <app-hero />
       <div class="grid grid-cols-1 min-[901px]:grid-cols-[1fr_550px] gap-6 items-start py-6 px-4 min-[901px]:py-8 min-[901px]:px-8">
         <div>
@@ -48,6 +50,8 @@ import { AccordionItemComponent } from './components/shared/accordion-item.compo
         </div>
       </div>
       <div id="print-report"></div>
+      <div class="flex-1"></div>
+      <app-footer />
     </div>
     <app-locale-pill />
   `,

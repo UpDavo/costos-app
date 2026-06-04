@@ -1,7 +1,7 @@
 <div class="px-5 pb-5">
   <div
-    class="flex items-center gap-[6px] text-[0.7rem] font-semibold tracking-[0.06em] uppercase text-[#6b7280] mb-[14px]">
-    <i class="pi pi-chart-pie text-[#2d6a4f]"></i>
+    class="flex items-center gap-[6px] text-[0.7rem] font-mono font-semibold tracking-widest uppercase text-[var(--muted)] mb-[14px]">
+    <i class="pi pi-chart-pie text-[var(--primary)]"></i>
     Distribución de costos
   </div>
   <div class="flex items-center gap-5">
@@ -9,11 +9,11 @@
       [style]="{ width: '148px', height: '148px' }" />
     <div class="flex flex-col gap-[6px] flex-1">
       @for (item of legendItems(); track item.label) {
-      <div class="flex items-center gap-[7px] text-[0.73rem] text-[#6b7280]">
-        <span class="w-[9px] h-[9px] rounded-full shrink-0"
+      <div class="flex items-center gap-[7px] text-[0.73rem] text-[var(--muted)]">
+        <span class="w-[9px] h-[9px] shrink-0"
           [style.background]="item.color"></span>
         <span class="flex-1">{{ item.label }}</span>
-        <span class="font-semibold text-[0.72rem] text-[#111827]">{{ item.pct
+        <span class="font-semibold text-[0.72rem] text-[var(--text)]">{{ item.pct
           }}%</span>
       </div>
       }

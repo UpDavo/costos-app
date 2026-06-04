@@ -32,8 +32,8 @@ import { TooltipModule } from 'primeng/tooltip';
       line-height: 1;
     }
     .info-btn:hover {
-      color: var(--primary, #2d6a4f);
-      background: var(--primary-dim, rgba(45,106,79,0.08));
+      color: var(--primary, #443FE9);
+      background: var(--primary-dim, rgba(68,63,233,0.08));
     }
     .info-btn .pi {
       font-size: 0.78rem;

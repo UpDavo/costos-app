@@ -2,15 +2,15 @@ import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { CalculatorStateService } from '../../services/calculator-state.service';
 import { LITERS_PER_GALLON } from '../../services/cost-calculation.service';
 import { AppStore } from '../../store/app.store';
 import { InfoTooltipComponent } from '../shared/info-tooltip.component';
+import { ToggleComponent } from '../shared/toggle.component';
 
 @Component({
   selector: 'app-fuel-card',
-  imports: [CommonModule, FormsModule, InputNumberModule, ToggleSwitchModule, InfoTooltipComponent],
+  imports: [CommonModule, FormsModule, InputNumberModule, InfoTooltipComponent, ToggleComponent],
   templateUrl: './fuel-card.component.html',
 })
 export class FuelCardComponent {

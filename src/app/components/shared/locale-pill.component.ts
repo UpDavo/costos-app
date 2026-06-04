@@ -8,27 +8,27 @@ import { CalculatorStateService } from '../../services/calculator-state.service'
   imports: [CommonModule],
   template: `
     <div class="fixed bottom-5 right-5 z-[1000] flex items-center
-                bg-white border-[1.5px] border-[#c8d9d1] rounded-full
+                bg-white border-[1.5px] border-[var(--border)]
                 py-[6px] px-[14px]
-                shadow-[0_2px_8px_rgba(45,106,79,0.12),0_1px_3px_rgba(0,0,0,0.08)]
-                text-[0.75rem] font-semibold text-[#2d6a4f] tracking-[0.02em] select-none">
+                shadow-[0_2px_8px_rgba(68,63,233,0.12),0_1px_3px_rgba(0,0,0,0.08)]
+                text-[0.75rem] font-mono font-semibold text-[var(--primary)] tracking-[0.02em] select-none">
 
       <span class="flex items-center gap-[5px]">
         <i class="pi pi-map-marker text-[0.7rem] opacity-75"></i>
         {{ appStore.selectedCountry().name }}
       </span>
 
-      <span class="w-px h-3 bg-[#c8d9d1] mx-[10px]"></span>
+      <span class="w-px h-3 bg-[var(--border)] mx-[10px]"></span>
 
       <span class="flex items-center gap-[5px]">
         <i class="pi pi-wallet text-[0.7rem] opacity-75"></i>
         {{ appStore.selectedCountry().currency }}
       </span>
 
-      <span class="w-px h-3 bg-[#c8d9d1] mx-[10px]"></span>
+      <span class="w-px h-3 bg-[var(--border)] mx-[10px]"></span>
 
       <span class="flex items-center gap-[5px] transition-colors duration-200"
-            [class]="state.saveStatus() === 'saving' ? 'text-[#9ca3af]' : 'text-[#52b788]'">
+            [class]="state.saveStatus() === 'saving' ? 'text-[#9ca3af]' : 'text-[var(--primary-light)]'">
         @if (state.saveStatus() === 'saving') {
           <i class="pi pi-spin pi-spinner text-[0.7rem]"></i>
           <span>Guardando</span>

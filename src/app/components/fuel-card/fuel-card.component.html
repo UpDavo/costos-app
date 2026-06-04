@@ -1,32 +1,32 @@
 <div
-  class="bg-white border border-[#e2e8e4] rounded-[12px] p-5 mb-4 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] flex flex-col gap-3">
+  class="p-5 flex flex-col gap-3">
 
   <!-- Country selector -->
   <div class="flex flex-col gap-[5px]">
-    <label class="text-[0.78rem] text-[#6b7280] font-medium">País</label>
+    <label class="text-[0.78rem] text-[var(--muted)] font-medium">País</label>
     <div class="relative">
       <select
         [ngModel]="appStore.selectedCountryCode()"
         (ngModelChange)="appStore.selectCountry($event)"
-        class="w-full appearance-none bg-[#f8faf9] border border-[#d1d9d4] rounded-lg px-3 py-[9px] pr-8 text-[0.82rem] font-medium text-[#111827] cursor-pointer focus:outline-none focus:border-[#2d6a4f] focus:ring-1 focus:ring-[#2d6a4f]">
+        class="w-full appearance-none bg-[var(--surface2)] border border-[var(--border2)] px-3 py-[9px] pr-8 text-[0.82rem] font-medium text-[var(--text)] cursor-pointer focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary-dim)]">
         @for (c of appStore.allCountries(); track c.code) {
           <option [value]="c.code">{{ c.name }} ({{ c.currency }})</option>
         }
       </select>
-      <i class="pi pi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7280] text-[0.65rem] pointer-events-none"></i>
+      <i class="pi pi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted)] text-[0.65rem] pointer-events-none"></i>
     </div>
   </div>
 
   <!-- Fuel type buttons from selected country -->
   <div class="flex flex-col gap-[5px]">
-    <label class="text-[0.78rem] text-[#6b7280] font-medium">Tipo de combustible</label>
+    <label class="text-[0.78rem] text-[var(--muted)] font-medium">Tipo de combustible</label>
     <div class="grid grid-cols-3 gap-[6px]">
       @for (opt of appStore.selectedCountry().fuels; track opt.type) {
       <button
-        class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg border-[1.5px] cursor-pointer transition-all duration-150 text-center"
+        class="flex flex-col items-center gap-0.5 py-2 px-1 border-[1.5px] cursor-pointer transition-all duration-150 text-center"
         [ngClass]="state.fuel().type === opt.type
-                  ? 'bg-[rgba(45,106,79,0.08)] border-[#2d6a4f] text-[#2d6a4f]'
-                  : 'border-[#d1d9d4] bg-[#f8faf9] text-[#6b7280]'"
+                  ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
+                  : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
         (click)="state.setFuelType(opt.type)">
         <span class="text-[0.72rem]"
           [ngClass]="state.fuel().type === opt.type ? 'font-semibold' : 'font-medium'">{{
@@ -39,21 +39,21 @@
 
   <!-- Fuel unit -->
   <div class="flex flex-col gap-[5px]">
-    <label class="text-[0.78rem] text-[#6b7280] font-medium">Unidad de rendimiento</label>
+    <label class="text-[0.78rem] text-[var(--muted)] font-medium">Unidad de rendimiento</label>
     <div class="grid grid-cols-2 gap-[6px]">
       <button
-        class="flex items-center justify-center gap-[6px] py-[9px] px-2 rounded-lg border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
+        class="flex items-center justify-center gap-[6px] py-[9px] px-2 border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
         [ngClass]="state.fuel().unit === 'kmL'
-                ? 'bg-[rgba(45,106,79,0.08)] border-[#2d6a4f] text-[#2d6a4f]'
-                : 'border-[#d1d9d4] bg-[#f8faf9] text-[#6b7280]'"
+                ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
+                : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
         (click)="state.setFuelUnit('kmL')">
         <i class="pi pi-gauge"></i> km / litro
       </button>
       <button
-        class="flex items-center justify-center gap-[6px] py-[9px] px-2 rounded-lg border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
+        class="flex items-center justify-center gap-[6px] py-[9px] px-2 border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
         [ngClass]="state.fuel().unit === 'kmG'
-                ? 'bg-[rgba(45,106,79,0.08)] border-[#2d6a4f] text-[#2d6a4f]'
-                : 'border-[#d1d9d4] bg-[#f8faf9] text-[#6b7280]'"
+                ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
+                : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
         (click)="state.setFuelUnit('kmG')">
         <i class="pi pi-gauge"></i> km / galón
       </button>
@@ -64,7 +64,7 @@
   <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
     <div class="flex flex-col gap-[5px]">
       <label
-        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
         {{ rendLabel() }}
         <app-info-tip
           text="Cómo medirlo: llena el tanque, recorre 100 km exactos, vuelve a llenar. 100 ÷ litros cargados = km/L. Repite 2–3 veces para un promedio confiable." />
@@ -76,7 +76,7 @@
     </div>
     <div class="flex flex-col gap-[5px]">
       <label
-        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
         Precio ({{ appStore.selectedCountry().currencySymbol }} / galón)
         <span class="text-[0.65rem] text-[#e67e22] font-medium ml-1">Cambio? Editalo</span>
         <app-info-tip
@@ -92,35 +92,35 @@
 
   <!-- Equivalencia -->
   <div
-    class="flex items-center gap-[6px] text-[0.75rem] text-[#6b7280] bg-[#f8faf9] rounded-lg py-2 px-3">
-    <i class="pi pi-sync text-[#2d6a4f]"></i>
-    <span>Equivale a <b class="text-[#111827]">{{ state.fuelLabel() }}</b></span>
+    class="flex items-center gap-[6px] text-[0.75rem] text-[var(--muted)] bg-[var(--surface2)] py-2 px-3">
+    <i class="pi pi-sync text-[var(--primary)]"></i>
+    <span>Equivale a <b class="text-[var(--text)]">{{ state.fuelLabel() }}</b></span>
   </div>
 
   <!-- Ralenti -->
-  <div class="bg-[#f8faf9] border border-[#e2e8e4] rounded-[10px] p-3">
+  <div class="bg-[var(--surface2)] border border-[var(--border)] p-3">
     <div class="flex justify-between items-start">
       <div class="flex items-start gap-[10px]">
-        <i class="pi pi-clock text-[#2d6a4f] text-base mt-[2px]"></i>
+        <i class="pi pi-clock text-[var(--primary)] text-base mt-[2px]"></i>
         <div>
           <div
-            class="text-[0.82rem] font-medium text-[#111827] flex items-center gap-1">
+            class="text-[0.82rem] font-medium text-[var(--text)] flex items-center gap-1">
             Tiempo en ralenti
             <app-info-tip
               text="Motor encendido sin avanzar: semaforos, trafico, calentamiento. En Quito/Guayaquil estima 200-400 h/ano. Carretera: 80-150 h/ano." />
           </div>
-          <div class="text-[0.7rem] text-[#6b7280] mt-[2px]">Motor encendido sin avanzar</div>
+          <div class="text-[0.7rem] text-[var(--muted)] mt-[2px]">Motor encendido sin avanzar</div>
         </div>
       </div>
-      <p-toggleswitch [ngModel]="state.idle().enabled"
-        (ngModelChange)="state.patchIdle({ enabled: $event })" />
+      <app-toggle [checked]="state.idle().enabled"
+        (checkedChange)="state.patchIdle({ enabled: $event })" />
     </div>
 
     @if (state.idle().enabled) {
     <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3 mt-3">
       <div class="flex flex-col gap-[5px]">
         <label
-          class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+          class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
           Consumo en ralenti (L / h)
           <app-info-tip
             text="Tipico: 0.5-0.8 L/h para autos pequenos (1.4-1.8L), 1.0-1.5 L/h para camionetas o diesel." />
@@ -132,7 +132,7 @@
       </div>
       <div class="flex flex-col gap-[5px]">
         <label
-          class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+          class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
           Horas de ralenti al ano
           <app-info-tip
             text="Suma el tiempo con motor encendido sin moverte: semaforos, trafico, esperas. Quito/Guayaquil con trafico: 250-400 h/ano es normal." />
@@ -143,7 +143,7 @@
       </div>
     </div>
     <div
-      class="bg-white border border-[#e2e8e4] rounded-lg py-2 px-3 text-[0.73rem] text-[#6b7280] leading-[1.6] mt-2"
+      class="bg-white border border-[var(--border)] py-2 px-3 text-[0.73rem] text-[var(--muted)] leading-[1.6] mt-2"
       [innerHTML]="idleExplain()"></div>
     }
   </div>

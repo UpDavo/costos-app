@@ -39,17 +39,17 @@ export class ResultPanelComponent {
   breakdownRows = computed((): BreakdownRow[] => {
     const r = this.state.result();
     return [
-      { label: 'Combustible', icon: 'pi-bolt', perKm: r.fuelPerKm + r.idlePerKm, color: '#2d6a4f' },
-      { label: 'Mantenimiento', icon: 'pi-wrench', perKm: r.maintPerKm, color: '#52b788' },
+      { label: 'Combustible', icon: 'pi-bolt', perKm: r.fuelPerKm + r.idlePerKm, color: '#443FE9' },
+      { label: 'Mantenimiento', icon: 'pi-wrench', perKm: r.maintPerKm, color: '#6B67FF' },
       { label: 'Depreciación', icon: 'pi-chart-line', perKm: r.deprPerKm, color: '#3b82f6' },
       { label: 'Seguros', icon: 'pi-shield', perKm: r.insurePerKm, color: '#f59e0b' },
-      { label: 'Parqueadero', icon: 'pi-map-marker', perKm: r.parkPerKm, color: '#6b7280' },
+      { label: 'Parqueadero', icon: 'pi-map-marker', perKm: r.parkPerKm, color: '#9ca3af' },
     ];
   });
 
   iconBg: Record<string, string> = {
-    'pi-bolt': 'rgba(45,106,79,0.1)',
-    'pi-wrench': 'rgba(82,183,136,0.12)',
+    'pi-bolt': 'rgba(68,63,233,0.1)',
+    'pi-wrench': 'rgba(107,103,255,0.12)',
     'pi-chart-line': 'rgba(59,130,246,0.1)',
     'pi-shield': 'rgba(245,158,11,0.1)',
     'pi-map-marker': 'rgba(107,114,128,0.1)',
