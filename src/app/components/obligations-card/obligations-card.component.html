@@ -1,0 +1,76 @@
+<div
+  class="flex items-center gap-2 text-[0.7rem] font-semibold tracking-[0.08em] uppercase text-[#2d6a4f] mb-3">
+  <i class="pi pi-shield text-[0.8rem]"></i>
+  <span>Obligaciones anuales</span>
+</div>
+
+<div
+  class="bg-white border border-[#e2e8e4] rounded-[12px] p-5 mb-4 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] flex flex-col gap-3">
+
+  <div class="grid grid-cols-3 gap-3">
+    <div class="flex flex-col gap-[5px]">
+      <label
+        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        Matrícula anual ({{ appStore.selectedCountry().currency }})
+        <app-info-tip
+          text="Impuesto anual del Municipio para circular legalmente. Varía según el avalúo del auto. En Ecuador oscila entre $30 y $400+ para autos de lujo." />
+      </label>
+      <p-inputnumber [ngModel]="state.obligations().matricula"
+        (ngModelChange)="state.patchObligations({ matricula: $event ?? 0 })"
+        [min]="0" [step]="10" [useGrouping]="false"
+        inputStyleClass="input-field" />
+    </div>
+    <div class="flex flex-col gap-[5px]">
+      <label
+        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        SOAT anual ({{ appStore.selectedCountry().currency }})
+        <app-info-tip
+          text="Seguro Obligatorio de Accidentes de Tránsito. Obligatorio en Ecuador. Cubre lesiones a terceros. Costo típico: $60–$120 según tipo de vehículo." />
+      </label>
+      <p-inputnumber [ngModel]="state.obligations().soat"
+        (ngModelChange)="state.patchObligations({ soat: $event ?? 0 })"
+        [min]="0" [step]="5" [useGrouping]="false"
+        inputStyleClass="input-field" />
+    </div>
+    <div class="flex flex-col gap-[5px]">
+      <label
+        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        Seguro privado anual ({{ appStore.selectedCountry().currency }})
+        <app-info-tip
+          text="Seguro todo riesgo o contra terceros (Seguros Sucre, Oriente, AIG, etc.). Cubre daños, robo, incendio. Opcional pero recomendado." />
+      </label>
+      <p-inputnumber [ngModel]="state.obligations().seguroPrivado"
+        (ngModelChange)="state.patchObligations({ seguroPrivado: $event ?? 0 })"
+        [min]="0" [step]="50" [useGrouping]="false"
+        inputStyleClass="input-field" />
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3">
+    <div class="flex flex-col gap-[5px]">
+      <label
+        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        Revisión técnica ({{ appStore.selectedCountry().currency }}/año)
+        <app-info-tip
+          text="Revisión obligatoria anual o bianual. Verifica emisiones y condición mecánica. Costo aprox: $20–$50 en Ecuador." />
+      </label>
+      <p-inputnumber [ngModel]="state.obligations().revisionTecnica"
+        (ngModelChange)="state.patchObligations({ revisionTecnica: $event ?? 0 })"
+        [min]="0" [step]="5" [useGrouping]="false"
+        inputStyleClass="input-field" />
+    </div>
+    <div class="flex flex-col gap-[5px]">
+      <label
+        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        Parqueadero mensual ({{ appStore.selectedCountry().currency }})
+        <app-info-tip
+          text="Costo mensual de parqueadero fijo. Se multiplica × 12 para el cálculo anual. Si usas parqueadero público ocasional, estima un promedio." />
+      </label>
+      <p-inputnumber [ngModel]="state.obligations().parking"
+        (ngModelChange)="state.patchObligations({ parking: $event ?? 0 })"
+        [min]="0" [step]="10" [useGrouping]="false"
+        inputStyleClass="input-field" />
+    </div>
+  </div>
+
+</div>

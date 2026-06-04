@@ -1,0 +1,47 @@
+<div
+  class="mx-5 mb-5 bg-[#f8faf9] border border-[#e2e8e4] rounded-[10px] p-[14px]">
+
+  <div class="flex justify-between items-center mb-3">
+    <div
+      class="flex items-center gap-[6px] text-[0.7rem] font-semibold tracking-[0.06em] uppercase text-[#6b7280]">
+      <i class="pi pi-chart-line text-[#2d6a4f]"></i>
+      Curva de depreciación
+    </div>
+    <div class="flex gap-3">
+      <span class="flex items-center gap-[5px] text-[0.65rem] text-[#6b7280]">
+        <span
+          class="inline-block w-[18px] h-[2px] rounded-[2px] bg-[#9ca3af]"></span>Pasado
+      </span>
+      <span class="flex items-center gap-[5px] text-[0.65rem] text-[#6b7280]">
+        <span
+          class="inline-block w-[18px] h-[2px] rounded-[2px] bg-[#2d6a4f]"></span>Proyección
+      </span>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-[6px] mb-3">
+    <div class="bg-white border border-[#e2e8e4] rounded-lg p-2 text-center">
+      <div
+        class="text-[0.6rem] text-[#6b7280] uppercase tracking-[0.05em] mb-[3px]">Compra</div>
+      <div class="text-[0.82rem] font-semibold text-[#111827]">{{ appStore.selectedCountry().currencySymbol }}{{
+        purchasePrice() | number:'1.0-0' }}</div>
+    </div>
+    <div
+      class="bg-[rgba(45,106,79,0.06)] border border-[#2d6a4f] rounded-lg p-2 text-center">
+      <div
+        class="text-[0.6rem] text-[#6b7280] uppercase tracking-[0.05em] mb-[3px]">Hoy</div>
+      <div class="text-[0.82rem] font-semibold text-[#2d6a4f]">{{ appStore.selectedCountry().currencySymbol }}{{
+        vehicleValue() | number:'1.0-0' }}</div>
+    </div>
+    <div
+      class="bg-[#fff5f5] border border-[#fca5a5] rounded-lg p-2 text-center">
+      <div
+        class="text-[0.6rem] text-[#6b7280] uppercase tracking-[0.05em] mb-[3px]">Residual</div>
+      <div class="text-[0.82rem] font-semibold text-[#dc2626]">{{ appStore.selectedCountry().currencySymbol }}{{
+        residualValue() | number:'1.0-0' }}</div>
+    </div>
+  </div>
+
+  <p-chart type="line" [data]="chartData()" [options]="chartOptions()"
+    [style]="{ height: '150px' }" />
+</div>

@@ -1,0 +1,143 @@
+<div
+  class="flex items-center gap-2 text-[0.7rem] font-semibold tracking-[0.08em] uppercase text-[#2d6a4f] mb-3">
+  <i class="pi pi-car text-[0.8rem]"></i>
+  <span>Datos del vehículo</span>
+</div>
+
+<div
+  class="bg-white border border-[#e2e8e4] rounded-[12px] p-5 mb-4 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] flex flex-col gap-3">
+
+  <div class="grid grid-cols-2 gap-3">
+    <div class="flex flex-col gap-[5px]">
+      <label
+        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        Precio de compra original ({{ appStore.selectedCountry().currency }})
+        <app-info-tip
+          text="Lo que pagaste al comprar el auto. Usa el precio original, no el valor actual de mercado." />
+      </label>
+      <p-inputnumber [ngModel]="state.vehicle().purchasePrice"
+        (ngModelChange)="state.patchVehicle({ purchasePrice: $event ?? 0 })"
+        [min]="500" [step]="500" [useGrouping]="false"
+        inputStyleClass="input-field" />
+    </div>
+    <div class="flex flex-col gap-[5px]">
+      <label
+        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        Año de compra / fabricación
+        <app-info-tip
+          text="Año en que compraste o se fabricó el auto. Se usa para calcular cuánto ha perdido de valor hasta hoy." />
+      </label>
+      <p-inputnumber [ngModel]="state.vehicle().vehicleYear"
+        (ngModelChange)="state.patchVehicle({ vehicleYear: $event ?? 2022 })"
+        [min]="1990" [max]="2026" [step]="1" [useGrouping]="false"
+        inputStyleClass="input-field" />
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3">
+    <div class="flex flex-col gap-[5px]">
+      <label
+        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        Valor actual del auto ({{ appStore.selectedCountry().currency }})
+        <app-info-tip
+          text="Precio al que podrías vender el auto HOY. Consulta Patiotuerca u OLX para referencias de tu modelo y año." />
+      </label>
+      <p-inputnumber [ngModel]="state.vehicle().vehicleValue"
+        (ngModelChange)="state.patchVehicle({ vehicleValue: $event ?? 0 })"
+        [min]="0" [step]="500" [useGrouping]="false"
+        inputStyleClass="input-field" />
+    </div>
+    <div class="flex flex-col gap-[5px]">
+      <label
+        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        Valor residual estimado ({{ appStore.selectedCountry().currency }})
+        <app-info-tip
+          text="Cuánto esperas recibir al venderlo al final. Regla: 10–15% del precio original para autos de 10+ años. Busca tu modelo en Patiotuerca con más años." />
+      </label>
+      <p-inputnumber [ngModel]="state.vehicle().residualValue"
+        (ngModelChange)="state.patchVehicle({ residualValue: $event ?? 0 })"
+        [min]="0" [step]="500" [useGrouping]="false"
+        inputStyleClass="input-field" />
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3">
+    <div class="flex flex-col gap-[5px]">
+      <label
+        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        Kilómetros anuales recorridos
+        <app-info-tip
+          text="Km que recorres en un año típico. Tip: revisa el odómetro en enero y diciembre. Promedio Ecuador: 15,000–25,000 km/año." />
+      </label>
+      <p-inputnumber [ngModel]="state.vehicle().annualKm"
+        (ngModelChange)="state.patchVehicle({ annualKm: $event ?? 1000 })"
+        [min]="1000" [step]="1000" [useGrouping]="false"
+        inputStyleClass="input-field" />
+    </div>
+    <div class="flex flex-col gap-[5px]">
+      <label
+        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        Años de vida útil restantes
+        <app-info-tip
+          text="Años que planeas usar el auto antes de venderlo. Afecta directamente el costo de depreciación por km." />
+      </label>
+      <p-inputnumber [ngModel]="state.vehicle().usefulLife"
+        (ngModelChange)="state.patchVehicle({ usefulLife: $event ?? 1 })"
+        [min]="1" [max]="30" [step]="1" [useGrouping]="false"
+        inputStyleClass="input-field" />
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-[5px]">
+    <label
+      class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+      Método de depreciación
+      <app-info-tip
+        text="Acelerada: los autos pierden más valor los primeros años (realidad del mercado ecuatoriano). Lineal: pérdida uniforme. Usa Acelerada para autos nuevos." />
+    </label>
+    <div class="grid grid-cols-2 gap-[6px]">
+      <button
+        class="flex flex-col items-center gap-[3px] py-[10px] px-2 rounded-lg border-[1.5px] text-[0.8rem] font-medium cursor-pointer transition-all duration-150 text-center"
+        [ngClass]="state.vehicle().deprMethod === 'accel'
+                ? 'bg-[rgba(45,106,79,0.08)] border-[#2d6a4f] text-[#2d6a4f]'
+                : 'border-[#d1d9d4] bg-[#f8faf9] text-[#6b7280]'"
+        (click)="state.patchVehicle({ deprMethod: 'accel' })">
+        <i class="pi pi-chart-line text-[0.9rem]"></i>
+        <span>Acelerada</span>
+        <small class="text-[0.65rem] font-normal opacity-80">Autos
+          nuevos</small>
+      </button>
+      <button
+        class="flex flex-col items-center gap-[3px] py-[10px] px-2 rounded-lg border-[1.5px] text-[0.8rem] font-medium cursor-pointer transition-all duration-150 text-center"
+        [ngClass]="state.vehicle().deprMethod === 'linear'
+                ? 'bg-[rgba(45,106,79,0.08)] border-[#2d6a4f] text-[#2d6a4f]'
+                : 'border-[#d1d9d4] bg-[#f8faf9] text-[#6b7280]'"
+        (click)="state.patchVehicle({ deprMethod: 'linear' })">
+        <i class="pi pi-minus text-[0.9rem]"></i>
+        <span>Lineal</span>
+        <small class="text-[0.65rem] font-normal opacity-80">Autos
+          viejos</small>
+      </button>
+    </div>
+  </div>
+
+  <div
+    class="flex items-center gap-2 bg-[rgba(45,106,79,0.08)] border border-[rgba(45,106,79,0.15)] rounded-lg py-2 px-3 text-[0.78rem] text-[#2d6a4f]">
+    <i class="pi pi-tag text-[0.8rem] opacity-70"></i>
+    <span>
+      En {{ ageLabel() }}: <b>{{ state.vehicle().purchasePrice |
+        currency:appStore.selectedCountry().currency:'symbol':'1.0-0' }}</b>
+      <i class="pi pi-arrow-right text-[0.65rem] mx-1"></i>
+      <b>{{ state.vehicle().vehicleValue | currency:appStore.selectedCountry().currency:'symbol':'1.0-0'
+        }}</b>
+    </span>
+    <span
+      class="ml-auto flex items-center gap-1 bg-[rgba(220,38,38,0.08)] text-[#dc2626] py-[2px] px-2 rounded-[12px] text-[0.72rem] font-medium">
+      <i class="pi pi-arrow-down text-[0.6rem]"></i>
+      {{ state.vehicle().purchasePrice - state.vehicle().vehicleValue |
+      currency:appStore.selectedCountry().currency:'symbol':'1.0-0' }}
+      ({{ lossPct() }}%)
+    </span>
+  </div>
+
+</div>

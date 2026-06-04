@@ -1,1 +1,149 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import "tailwindcss";
+@import "tailwindcss-primeui";
+@import "primeicons/primeicons.css";
+
+:root {
+  --bg: #f2f4f3;
+  --surface: #ffffff;
+  --surface2: #f8faf9;
+  --border: #e2e8e4;
+  --border2: #d1d9d4;
+  --text: #111827;
+  --muted: #6b7280;
+  --primary: #2d6a4f;
+  --primary-dark: #1b4332;
+  --primary-light: #52b788;
+  --primary-dim: rgba(45,106,79,0.08);
+  --primary-dim2: rgba(45,106,79,0.15);
+  --red: #dc2626;
+  --red-dim: rgba(220,38,38,0.08);
+  --blue: #2563eb;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Roboto', sans-serif;
+}
+
+/* ── PrimeNG input overrides ── */
+.p-inputtext,
+.p-inputnumber-input,
+.input-field {
+  background: var(--surface) !important;
+  border: 1.5px solid var(--border2) !important;
+  border-radius: 8px !important;
+  color: var(--text) !important;
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 0.875rem !important;
+  padding: 8px 12px !important;
+  width: 100% !important;
+  outline: none !important;
+  transition: border-color 0.15s, box-shadow 0.15s !important;
+  box-shadow: none !important;
+}
+
+.p-inputtext:focus,
+.p-inputnumber-input:focus,
+.input-field:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px var(--primary-dim) !important;
+}
+
+.input-field-sm {
+  background: var(--surface) !important;
+  border: 1.5px solid var(--border2) !important;
+  border-radius: 8px !important;
+  color: var(--text) !important;
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 0.8rem !important;
+  padding: 6px 10px !important;
+  width: 100% !important;
+  transition: border-color 0.15s !important;
+}
+
+.input-field-sm:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px var(--primary-dim) !important;
+  outline: none !important;
+}
+
+/* ── PrimeNG dialog ── */
+.p-dialog {
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.p-dialog .p-dialog-header {
+  border-bottom: 1px solid var(--border) !important;
+  font-family: 'Roboto', sans-serif !important;
+  font-weight: 500 !important;
+}
+.p-dialog .p-dialog-footer {
+  border-top: 1px solid var(--border) !important;
+}
+
+/* ── PrimeNG toggleswitch ── */
+.p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
+  background: var(--primary) !important;
+}
+.p-toggleswitch .p-toggleswitch-slider {
+  position: relative !important;
+}
+.p-toggleswitch .p-toggleswitch-slider::before {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin: 0 !important;
+}
+.p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider::before {
+  transform: translateY(-50%) translateX(var(--p-toggleswitch-handle-size, 1.25rem)) !important;
+}
+
+/* ── PrimeNG tooltip ── */
+.p-tooltip .p-tooltip-text {
+  background: var(--primary-dark) !important;
+  color: #fff !important;
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 0.78rem !important;
+  line-height: 1.5 !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  max-width: 280px !important;
+  box-shadow: var(--shadow-md) !important;
+}
+.p-tooltip .p-tooltip-arrow {
+  border-top-color: var(--primary-dark) !important;
+  border-bottom-color: var(--primary-dark) !important;
+  border-left-color: var(--primary-dark) !important;
+  border-right-color: var(--primary-dark) !important;
+}
+
+/* ── PrimeNG button ── */
+.p-button {
+  font-family: 'Roboto', sans-serif !important;
+  font-weight: 500 !important;
+}
+.p-button.p-button-primary,
+.p-button:not(.p-button-secondary):not(.p-button-danger):not(.p-button-text) {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+.p-button.p-button-primary:hover,
+.p-button:not(.p-button-secondary):not(.p-button-danger):not(.p-button-text):hover {
+  background: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+}
+
+/* ── Print ── */
+@media print {
+  body > * { display: none !important; }
+  #print-report { display: block !important; position: fixed; top: 0; left: 0; width: 100%; z-index: 99999; background: white; }
+}
+#print-report { display: none; }

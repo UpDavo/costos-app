@@ -1,0 +1,49 @@
+<div
+  class="bg-white border border-[#e2e8e4] rounded-lg px-3 py-[10px] mb-[6px] transition-opacity duration-200"
+  [style.opacity]="item().enabled ? '1' : '0.45'">
+
+  <div class="flex justify-between items-center">
+    <div class="flex items-center gap-2">
+      <p-toggleswitch [ngModel]="item().enabled"
+        (ngModelChange)="enabledChange.emit($event)" />
+      <span class="text-[0.8rem] font-medium text-[#111827]">{{ item().name
+        }}</span>
+    </div>
+    <div class="flex items-center gap-[6px]">
+      <span
+        class="flex items-center gap-[3px] text-[0.72rem] text-[#2d6a4f] font-medium cursor-default bg-[rgba(45,106,79,0.08)] px-2 py-[2px] rounded-[12px]"
+        [pTooltip]="currencySymbol() + (item().cost | number:'1.2-2') + ' ÷ ' + (item().every | number:'1.0-0') + ' km'"
+        tooltipPosition="left">
+        <i class="pi pi-calculator text-[0.65rem]"></i>
+        {{ currencySymbol() }}{{ costPerKm() | number:'1.4-4' }}/km
+      </span>
+      <button
+        class="flex items-center bg-transparent border-0 text-[#9ca3af] cursor-pointer p-1 rounded-md transition-all duration-150 hover:text-[#dc2626] hover:bg-[rgba(220,38,38,0.08)]"
+        (click)="remove.emit()"
+        [pTooltip]="'Eliminar'"
+        tooltipPosition="left">
+        <i class="pi pi-trash text-[0.75rem]"></i>
+      </button>
+    </div>
+  </div>
+
+  @if (item().enabled) {
+  <div
+    class="grid grid-cols-2 gap-2 mt-[10px] pt-[10px] border-t border-[#e2e8e4]">
+    <div class="flex flex-col gap-1">
+      <label class="text-[0.7rem] text-[#6b7280] font-medium">Costo del servicio
+        ({{ currencyCode() }})</label>
+      <p-inputnumber [ngModel]="item().cost"
+        (ngModelChange)="costChange.emit($event ?? 1)" [min]="1" [step]="1"
+        [useGrouping]="false" inputStyleClass="input-field-sm" />
+    </div>
+    <div class="flex flex-col gap-1">
+      <label class="text-[0.7rem] text-[#6b7280] font-medium">Cada cuántos
+        km</label>
+      <p-inputnumber [ngModel]="item().every"
+        (ngModelChange)="everyChange.emit($event ?? 100)" [min]="100"
+        [step]="100" [useGrouping]="false" inputStyleClass="input-field-sm" />
+    </div>
+  </div>
+  }
+</div>

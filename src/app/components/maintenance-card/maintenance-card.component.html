@@ -1,0 +1,58 @@
+<div
+  class="flex items-center gap-2 text-[0.7rem] font-semibold tracking-[0.08em] uppercase text-[#2d6a4f] mb-3">
+  <i class="pi pi-wrench text-[0.8rem]"></i>
+  <span>Mantenimiento y piezas</span>
+  <app-info-tip
+    text="Valores de referencia del mercado ecuatoriano 2026. Ajusta según tu mecánico. Desactiva los ítems que no apliquen (ej: embrague en automático)." />
+</div>
+
+<div
+  class="bg-white border border-[#e2e8e4] rounded-[12px] p-4 mb-4 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]">
+  @for (item of state.maintenanceItems(); track item.id) {
+  <app-maintenance-item
+    [item]="item"
+    [currencySymbol]="appStore.selectedCountry().currencySymbol"
+    [currencyCode]="appStore.selectedCountry().currency"
+    (enabledChange)="state.updateMaintenanceItem(item.id, { enabled: $event })"
+    (costChange)="state.updateMaintenanceItem(item.id, { cost: $event })"
+    (everyChange)="state.updateMaintenanceItem(item.id, { every: $event })"
+    (remove)="state.removeMaintenanceItem(item.id)" />
+  }
+  <button
+    class="flex items-center justify-center gap-[6px] w-full py-[9px] bg-transparent border-[1.5px] border-dashed border-[#d1d9d4] rounded-lg text-[#6b7280] text-[0.78rem] font-medium cursor-pointer transition-all duration-150 mt-1 hover:border-[#2d6a4f] hover:text-[#2d6a4f] hover:bg-[rgba(45,106,79,0.08)]"
+    (click)="showDialog.set(true)">
+    <i class="pi pi-plus"></i>
+    Agregar ítem personalizado
+  </button>
+</div>
+
+<p-dialog header="Agregar ítem de mantenimiento" [(visible)]="showDialog"
+  [modal]="true" [style]="{ width: '420px' }">
+  <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-[5px]">
+      <label class="text-[0.78rem] text-[#6b7280] font-medium">Nombre del
+        servicio</label>
+      <input pInputText [(ngModel)]="newName"
+        placeholder="Ej: Cambio de refrigerante" class="w-full" />
+    </div>
+    <div class="grid grid-cols-2 gap-[10px]">
+      <div class="flex flex-col gap-[5px]">
+        <label class="text-[0.78rem] text-[#6b7280] font-medium">Costo
+          ({{ appStore.selectedCountry().currency }})</label>
+        <p-inputnumber [(ngModel)]="newCost" [min]="1" [step]="1"
+          [useGrouping]="false" inputStyleClass="input-field" />
+      </div>
+      <div class="flex flex-col gap-[5px]">
+        <label class="text-[0.78rem] text-[#6b7280] font-medium">Cada cuántos
+          km</label>
+        <p-inputnumber [(ngModel)]="newEvery" [min]="100" [step]="100"
+          [useGrouping]="false" inputStyleClass="input-field" />
+      </div>
+    </div>
+  </div>
+  <ng-template #footer>
+    <p-button label="Cancelar" severity="secondary" (onClick)="closeDialog()" />
+    <p-button label="Agregar" icon="pi pi-plus" (onClick)="addItem()"
+      [disabled]="!newName.trim()" />
+  </ng-template>
+</p-dialog>

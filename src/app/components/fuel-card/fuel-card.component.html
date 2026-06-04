@@ -1,0 +1,156 @@
+<div
+  class="flex items-center gap-2 text-[0.7rem] font-semibold tracking-[0.08em] uppercase text-[#2d6a4f] mb-3">
+  <i class="pi pi-bolt text-[0.8rem]"></i>
+  <span>Combustible</span>
+</div>
+
+<div
+  class="bg-white border border-[#e2e8e4] rounded-[12px] p-5 mb-4 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] flex flex-col gap-3">
+
+  <!-- Country selector -->
+  <div class="flex flex-col gap-[5px]">
+    <label class="text-[0.78rem] text-[#6b7280] font-medium">País</label>
+    <div class="relative">
+      <select
+        [ngModel]="appStore.selectedCountryCode()"
+        (ngModelChange)="appStore.selectCountry($event)"
+        class="w-full appearance-none bg-[#f8faf9] border border-[#d1d9d4] rounded-lg px-3 py-[9px] pr-8 text-[0.82rem] font-medium text-[#111827] cursor-pointer focus:outline-none focus:border-[#2d6a4f] focus:ring-1 focus:ring-[#2d6a4f]">
+        @for (c of appStore.allCountries(); track c.code) {
+          <option [value]="c.code">{{ c.name }} ({{ c.currency }})</option>
+        }
+      </select>
+      <i class="pi pi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7280] text-[0.65rem] pointer-events-none"></i>
+    </div>
+  </div>
+
+  <!-- Fuel type buttons from selected country -->
+  <div class="flex flex-col gap-[5px]">
+    <label class="text-[0.78rem] text-[#6b7280] font-medium">Tipo de combustible</label>
+    <div class="grid grid-cols-3 gap-[6px]">
+      @for (opt of appStore.selectedCountry().fuels; track opt.type) {
+      <button
+        class="flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg border-[1.5px] cursor-pointer transition-all duration-150 text-center"
+        [ngClass]="state.fuel().type === opt.type
+                  ? 'bg-[rgba(45,106,79,0.08)] border-[#2d6a4f] text-[#2d6a4f]'
+                  : 'border-[#d1d9d4] bg-[#f8faf9] text-[#6b7280]'"
+        (click)="state.setFuelType(opt.type)">
+        <span class="text-[0.72rem]"
+          [ngClass]="state.fuel().type === opt.type ? 'font-semibold' : 'font-medium'">{{
+          opt.label }}</span>
+        <span class="text-[0.65rem] opacity-75">{{ appStore.selectedCountry().currencySymbol }}{{ opt.pricePerGal | number:'1.3-3' }}/gal</span>
+      </button>
+      }
+    </div>
+  </div>
+
+  <!-- Fuel unit -->
+  <div class="flex flex-col gap-[5px]">
+    <label class="text-[0.78rem] text-[#6b7280] font-medium">Unidad de rendimiento</label>
+    <div class="grid grid-cols-2 gap-[6px]">
+      <button
+        class="flex items-center justify-center gap-[6px] py-[9px] px-2 rounded-lg border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
+        [ngClass]="state.fuel().unit === 'kmL'
+                ? 'bg-[rgba(45,106,79,0.08)] border-[#2d6a4f] text-[#2d6a4f]'
+                : 'border-[#d1d9d4] bg-[#f8faf9] text-[#6b7280]'"
+        (click)="state.setFuelUnit('kmL')">
+        <i class="pi pi-gauge"></i> km / litro
+      </button>
+      <button
+        class="flex items-center justify-center gap-[6px] py-[9px] px-2 rounded-lg border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
+        [ngClass]="state.fuel().unit === 'kmG'
+                ? 'bg-[rgba(45,106,79,0.08)] border-[#2d6a4f] text-[#2d6a4f]'
+                : 'border-[#d1d9d4] bg-[#f8faf9] text-[#6b7280]'"
+        (click)="state.setFuelUnit('kmG')">
+        <i class="pi pi-gauge"></i> km / galón
+      </button>
+    </div>
+  </div>
+
+  <!-- Rendimiento + Precio -->
+  <div class="grid grid-cols-2 gap-3">
+    <div class="flex flex-col gap-[5px]">
+      <label
+        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        {{ rendLabel() }}
+        <app-info-tip
+          text="Cómo medirlo: llena el tanque, recorre 100 km exactos, vuelve a llenar. 100 ÷ litros cargados = km/L. Repite 2–3 veces para un promedio confiable." />
+      </label>
+      <p-inputnumber [ngModel]="state.fuel().rendimiento"
+        (ngModelChange)="state.patchFuel({ rendimiento: $event ?? 1 })"
+        [min]="1" [step]="0.5" [minFractionDigits]="1" [maxFractionDigits]="2"
+        [useGrouping]="false" inputStyleClass="input-field" />
+    </div>
+    <div class="flex flex-col gap-[5px]">
+      <label
+        class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+        Precio ({{ appStore.selectedCountry().currencySymbol }} / galón)
+        <span class="text-[0.65rem] text-[#e67e22] font-medium ml-1">Cambio? Editalo</span>
+        <app-info-tip
+          text="Precio oficial pre-cargado segun el tipo seleccionado. Modificalo manualmente si cambio." />
+      </label>
+      <p-inputnumber [ngModel]="state.fuel().pricePerGal"
+        (ngModelChange)="state.patchFuel({ pricePerGal: $event ?? 0.01 })"
+        [min]="0.01" [step]="0.001" [minFractionDigits]="3"
+        [maxFractionDigits]="3" [useGrouping]="false"
+        inputStyleClass="input-field" />
+    </div>
+  </div>
+
+  <!-- Equivalencia -->
+  <div
+    class="flex items-center gap-[6px] text-[0.75rem] text-[#6b7280] bg-[#f8faf9] rounded-lg py-2 px-3">
+    <i class="pi pi-sync text-[#2d6a4f]"></i>
+    <span>Equivale a <b class="text-[#111827]">{{ state.fuelLabel() }}</b></span>
+  </div>
+
+  <!-- Ralenti -->
+  <div class="bg-[#f8faf9] border border-[#e2e8e4] rounded-[10px] p-3">
+    <div class="flex justify-between items-start">
+      <div class="flex items-start gap-[10px]">
+        <i class="pi pi-clock text-[#2d6a4f] text-base mt-[2px]"></i>
+        <div>
+          <div
+            class="text-[0.82rem] font-medium text-[#111827] flex items-center gap-1">
+            Tiempo en ralenti
+            <app-info-tip
+              text="Motor encendido sin avanzar: semaforos, trafico, calentamiento. En Quito/Guayaquil estima 200-400 h/ano. Carretera: 80-150 h/ano." />
+          </div>
+          <div class="text-[0.7rem] text-[#6b7280] mt-[2px]">Motor encendido sin avanzar</div>
+        </div>
+      </div>
+      <p-toggleswitch [ngModel]="state.idle().enabled"
+        (ngModelChange)="state.patchIdle({ enabled: $event })" />
+    </div>
+
+    @if (state.idle().enabled) {
+    <div class="grid grid-cols-2 gap-3 mt-3">
+      <div class="flex flex-col gap-[5px]">
+        <label
+          class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+          Consumo en ralenti (L / h)
+          <app-info-tip
+            text="Tipico: 0.5-0.8 L/h para autos pequenos (1.4-1.8L), 1.0-1.5 L/h para camionetas o diesel." />
+        </label>
+        <p-inputnumber [ngModel]="state.idle().lph"
+          (ngModelChange)="state.patchIdle({ lph: $event ?? 0.1 })" [min]="0.1"
+          [step]="0.1" [minFractionDigits]="1" [maxFractionDigits]="2"
+          [useGrouping]="false" inputStyleClass="input-field" />
+      </div>
+      <div class="flex flex-col gap-[5px]">
+        <label
+          class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
+          Horas de ralenti al ano
+          <app-info-tip
+            text="Suma el tiempo con motor encendido sin moverte: semaforos, trafico, esperas. Quito/Guayaquil con trafico: 250-400 h/ano es normal." />
+        </label>
+        <p-inputnumber [ngModel]="state.idle().hours"
+          (ngModelChange)="state.patchIdle({ hours: $event ?? 0 })" [min]="0"
+          [step]="10" [useGrouping]="false" inputStyleClass="input-field" />
+      </div>
+    </div>
+    <div
+      class="bg-white border border-[#e2e8e4] rounded-lg py-2 px-3 text-[0.73rem] text-[#6b7280] leading-[1.6] mt-2"
+      [innerHTML]="idleExplain()"></div>
+    }
+  </div>
+</div>
