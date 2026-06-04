@@ -15,6 +15,11 @@
           "options": {
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
+            "outputPath": {
+              "base": ".",
+              "browser": "browser",
+              "server": "server"
+            },
             "assets": [
               {
                 "glob": "**/*",
