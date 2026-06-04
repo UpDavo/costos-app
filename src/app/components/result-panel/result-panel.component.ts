@@ -1,14 +1,6 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { DialogModule } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
-import { TooltipModule } from 'primeng/tooltip';
 import { CalculatorStateService } from '../../services/calculator-state.service';
-import { PdfReportService } from '../../services/pdf-report.service';
-import { PdfReportData } from '../../models/calculator.model';
 import { AppStore } from '../../store/app.store';
 import { BreakdownChartComponent } from './breakdown-chart/breakdown-chart.component';
 import { DepreciationChartComponent } from './depreciation-chart/depreciation-chart.component';
@@ -18,8 +10,7 @@ interface BreakdownRow { label: string; icon: string; perKm: number; color: stri
 @Component({
   selector: 'app-result-panel',
   imports: [
-    CommonModule, FormsModule, DialogModule, ButtonModule,
-    InputTextModule, TextareaModule, TooltipModule,
+    CommonModule,
     BreakdownChartComponent, DepreciationChartComponent,
   ],
   templateUrl: './result-panel.component.html',
@@ -27,14 +18,6 @@ interface BreakdownRow { label: string; icon: string; perKm: number; color: stri
 export class ResultPanelComponent {
   state = inject(CalculatorStateService);
   appStore = inject(AppStore);
-  private pdfService = inject(PdfReportService);
-
-  showPdf = signal(false);
-
-  pdf: PdfReportData = {
-    brand: '', model: '', color: '', plate: '', engine: '',
-    transmission: '', currentKm: '', owner: '', cedula: '', uso: '', notes: '',
-  };
 
   breakdownRows = computed((): BreakdownRow[] => {
     const r = this.state.result();
@@ -58,17 +41,5 @@ export class ResultPanelComponent {
   pct(val: number): number {
     const total = this.state.result().totalPerKm || 1;
     return Math.min((val / total) * 100, 100);
-  }
-
-  generatePdf() {
-    this.showPdf.set(false);
-    this.pdfService.generate(
-      this.pdf,
-      this.state.vehicle(),
-      this.state.fuel(),
-      this.state.obligations(),
-      this.state.result(),
-      this.state.maintenanceItems()
-    );
   }
 }

@@ -58,17 +58,3 @@ export interface DeprPoint {
   year: number;
   value: number;
 }
-
-export interface PdfReportData {
-  brand: string;
-  model: string;
-  color: string;
-  plate: string;
-  engine: string;
-  transmission: string;
-  currentKm: string;
-  owner: string;
-  cedula: string;
-  uso: string;
-  notes: string;
-}

@@ -3,19 +3,68 @@
 
   <!-- Country selector -->
   <div class="flex flex-col gap-[5px]">
-    <label class="text-[0.78rem] text-[var(--muted)] font-medium">País</label>
+    <label class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center gap-[4px]">
+      País
+      @if (appStore.countriesLoading()) {
+        <i class="pi pi-spin pi-spinner text-[0.7rem] text-[var(--primary)]"></i>
+      }
+    </label>
     <div class="relative">
-      <select
-        [ngModel]="appStore.selectedCountryCode()"
-        (ngModelChange)="appStore.selectCountry($event)"
-        class="w-full appearance-none bg-[var(--surface2)] border border-[var(--border2)] px-3 py-[9px] pr-8 text-[0.82rem] font-medium text-[var(--text)] cursor-pointer focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary-dim)]">
-        @for (c of appStore.allCountries(); track c.code) {
-          <option [value]="c.code">{{ c.name }} ({{ c.currency }})</option>
-        }
-      </select>
-      <i class="pi pi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted)] text-[0.65rem] pointer-events-none"></i>
+      <input
+        type="text"
+        class="input-field"
+        [ngModel]="showCountryOptions() ? countryFilter() : selectedCountryLabel()"
+        (focus)="showCountryOptions.set(true); countryFilter.set('')"
+        (ngModelChange)="countryFilter.set($event); showCountryOptions.set(true)"
+        placeholder="Filtra por pais o moneda" />
+      <i class="pi pi-search absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted)] text-[0.72rem] pointer-events-none"></i>
+
+      @if (showCountryOptions()) {
+        <div class="absolute z-20 left-0 right-0 top-[calc(100%+4px)] max-h-[240px] overflow-y-auto bg-white border-[1.5px] border-[var(--border2)] shadow-[var(--shadow-md)]">
+          @for (c of filteredCountries(); track c.code) {
+            <button
+              type="button"
+              class="w-full text-left px-3 py-2 border-b border-[var(--border)] last:border-b-0 hover:bg-[var(--primary-dim)] cursor-pointer"
+              [ngClass]="c.code === appStore.selectedCountryCode() ? 'bg-[var(--primary-dim)]' : ''"
+              (mousedown)="selectCountry(c.code)">
+              <span class="flex items-center justify-between gap-3">
+                <span class="text-[0.82rem] font-medium text-[var(--text)]">
+                  {{ c.flag }} {{ c.name }}
+                </span>
+                <span class="font-mono text-[0.72rem] text-[var(--primary)]">{{ c.currency }}</span>
+              </span>
+              <span class="block text-[0.68rem] text-[var(--muted)] mt-[2px]">
+                {{ c.currencyName || 'Moneda local' }}
+                @if (c.region) {
+                  <span> · {{ c.region }}</span>
+                }
+              </span>
+            </button>
+          } @empty {
+            <div class="px-3 py-3 text-[0.78rem] text-[var(--muted)]">Sin resultados</div>
+          }
+        </div>
+      }
     </div>
+    @if (appStore.countriesError()) {
+      <div class="text-[0.72rem] text-[var(--red)]">{{ appStore.countriesError() }}</div>
+    }
   </div>
+
+  @if (appStore.selectedCountry().fuelPriceInfo; as info) {
+    <div class="flex items-start gap-2 bg-[var(--primary-dim)] border border-[var(--primary-dim2)] py-2 px-3 text-[0.74rem] text-[var(--primary)]">
+      <i class="pi pi-database text-[0.78rem] mt-[2px]"></i>
+      <div>
+        <b>Precios mensuales:</b> {{ info.periodLabel }} · {{ info.sourceName }}
+        <a class="underline underline-offset-2 ml-1" [href]="info.sourceUrl" target="_blank" rel="noreferrer">fuente</a>
+      </div>
+    </div>
+  } @else {
+    <div class="flex items-start gap-2 bg-[var(--surface2)] border border-[var(--border)] py-2 px-3 text-[0.74rem] text-[var(--muted)]">
+      <i class="pi pi-pen-to-square text-[0.78rem] mt-[2px]"></i>
+      <span>Moneda cargada desde la API de paises. Sin precio mensual de combustible para este pais todavia.</span>
+    </div>
+  }
 
   <!-- Fuel type buttons from selected country -->
   <div class="flex flex-col gap-[5px]">
@@ -27,11 +76,17 @@
         [ngClass]="state.fuel().type === opt.type
                   ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
                   : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
-        (click)="state.setFuelType(opt.type)">
+        (click)="selectFuel(opt)">
         <span class="text-[0.72rem]"
           [ngClass]="state.fuel().type === opt.type ? 'font-semibold' : 'font-medium'">{{
           opt.label }}</span>
-        <span class="text-[0.65rem] opacity-75">{{ appStore.selectedCountry().currencySymbol }}{{ opt.pricePerGal | number:'1.3-3' }}/gal</span>
+        <span class="text-[0.65rem] opacity-75">
+          @if (opt.pricePerGal > 0) {
+            {{ appStore.selectedCountry().currencySymbol }}{{ opt.pricePerGal | number:'1.3-3' }}/gal
+          } @else {
+            Manual
+          }
+        </span>
       </button>
       }
     </div>
@@ -94,7 +149,7 @@
   <div
     class="flex items-center gap-[6px] text-[0.75rem] text-[var(--muted)] bg-[var(--surface2)] py-2 px-3">
     <i class="pi pi-sync text-[var(--primary)]"></i>
-    <span>Equivale a <b class="text-[var(--text)]">{{ state.fuelLabel() }}</b></span>
+    <span>Equivale a <b class="text-[var(--text)]">{{ fuelEquivalentLabel() }}</b></span>
   </div>
 
   <!-- Ralenti -->

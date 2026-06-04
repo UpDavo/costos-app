@@ -1,6 +1,74 @@
 <div
   class="p-5 flex flex-col gap-3">
 
+  <div class="border-[1.5px] border-[var(--border2)] bg-[var(--surface2)] p-3 flex flex-col gap-3">
+    <div class="flex flex-col gap-[5px]">
+      <label
+        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+        Busca tu vehículo
+        <app-info-tip
+          text="Consulta una base pública por marca, modelo y año. Ej: Ford Ranger 2.5 nafta 2023." />
+      </label>
+      <div class="grid grid-cols-1 min-[520px]:grid-cols-[1fr_auto] gap-2">
+        <input
+          type="text"
+          class="input-field"
+          [ngModel]="state.vehicleLookupQuery()"
+          (ngModelChange)="state.setVehicleLookupQuery($event)"
+          (keydown.enter)="searchVehicle()"
+          placeholder="Ford Ranger 2.5 nafta 2023" />
+        <button
+          type="button"
+          class="h-[39px] px-4 bg-[var(--primary)] text-white text-[0.82rem] font-semibold flex items-center justify-center gap-2 border border-[var(--primary)] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          [disabled]="isLookingUp()"
+          (click)="searchVehicle()">
+          <i class="pi" [ngClass]="isLookingUp() ? 'pi-spin pi-spinner' : 'pi-search'"></i>
+          <span>{{ isLookingUp() ? 'Buscando' : 'Buscar' }}</span>
+        </button>
+      </div>
+    </div>
+
+    @if (state.vehicleLookupResult(); as vehicle) {
+      <div class="bg-white border border-[var(--border)] p-3 grid grid-cols-1 min-[520px]:grid-cols-[1fr_auto] gap-3">
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2 text-[0.72rem] text-[var(--primary)] font-mono uppercase tracking-widest">
+            <i class="pi pi-car text-[0.8rem]"></i>
+            Vehiculo encontrado
+          </div>
+          <strong class="text-[1rem] leading-tight text-[var(--text)]">
+            {{ vehicle.make }} {{ vehicle.model }}
+          </strong>
+          <span class="text-[0.78rem] text-[var(--muted)]">
+            {{ vehicle.year || 'Año no especificado' }}
+            @if (vehicle.vehicleType) {
+              <span> · {{ vehicle.vehicleType }}</span>
+            }
+          </span>
+        </div>
+        <div class="flex min-[520px]:items-end flex-col gap-1 text-[0.7rem] text-[var(--muted)]">
+          <span class="font-mono uppercase tracking-widest">{{ vehicle.sourceName }}</span>
+          <a
+            class="text-[var(--primary)] underline underline-offset-2"
+            [href]="vehicle.sourceUrl"
+            target="_blank"
+            rel="noreferrer">
+            Fuente publica
+          </a>
+        </div>
+        <p class="min-[520px]:col-span-2 m-0 text-[0.74rem] leading-relaxed text-[var(--muted)] border-t border-[var(--border)] pt-2">
+          {{ vehicle.note }}
+        </p>
+      </div>
+    }
+
+    @if (lookupError()) {
+      <div class="flex items-center gap-2 bg-[var(--red-dim)] text-[var(--red)] py-2 px-3 text-[0.76rem]">
+        <i class="pi pi-exclamation-triangle text-[0.78rem]"></i>
+        <span>{{ lookupError() }}</span>
+      </div>
+    }
+  </div>
+
   <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
     <div class="flex flex-col gap-[5px]">
       <label
@@ -68,7 +136,7 @@
         class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
         Kilómetros anuales recorridos
         <app-info-tip
-          text="Km que recorres en un año típico. Tip: revisa el odómetro en enero y diciembre. Promedio Ecuador: 15,000–25,000 km/año." />
+          text="Km que recorres en un año típico. Tip: revisa el odómetro en enero y diciembre. Promedio: 15,000–25,000 km/año." />
       </label>
       <p-inputnumber [ngModel]="state.vehicle().annualKm"
         (ngModelChange)="state.patchVehicle({ annualKm: $event ?? 1000 })"

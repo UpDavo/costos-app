@@ -19,7 +19,7 @@
         class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
         SOAT anual ({{ appStore.selectedCountry().currency }})
         <app-info-tip
-          text="Seguro Obligatorio de Accidentes de Tránsito. Obligatorio en Ecuador. Cubre lesiones a terceros. Costo típico: $60–$120 según tipo de vehículo." />
+          text="Seguro Obligatorio de Accidentes de Tránsito. Obligatorio en ciertos paises. Cubre lesiones a terceros. Costo típico: $60–$120 según tipo de vehículo." />
       </label>
       <p-inputnumber [ngModel]="state.obligations().soat"
         (ngModelChange)="state.patchObligations({ soat: $event ?? 0 })"
@@ -46,7 +46,7 @@
         class="text-[0.78rem] text-[#6b7280] font-medium flex items-center flex-wrap gap-[2px]">
         Revisión técnica ({{ appStore.selectedCountry().currency }}/año)
         <app-info-tip
-          text="Revisión obligatoria anual o bianual. Verifica emisiones y condición mecánica. Costo aprox: $20–$50 en Ecuador." />
+          text="Revisión obligatoria anual o bianual. Verifica emisiones y condición mecánica. Costo aprox: $20–$50" />
       </label>
       <p-inputnumber [ngModel]="state.obligations().revisionTecnica"
         (ngModelChange)="state.patchObligations({ revisionTecnica: $event ?? 0 })"

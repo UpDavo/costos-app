@@ -86,20 +86,6 @@ body {
   outline: none !important;
 }
 
-/* ── PrimeNG dialog ── */
-.p-dialog {
-  border-radius: 0 !important;
-  box-shadow: var(--shadow-md) !important;
-}
-.p-dialog .p-dialog-header {
-  border-bottom: 1px solid var(--border) !important;
-  font-family: 'Space Grotesk', sans-serif !important;
-  font-weight: 500 !important;
-}
-.p-dialog .p-dialog-footer {
-  border-top: 1px solid var(--border) !important;
-}
-
 /* ── PrimeNG toggleswitch ── */
 .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
   background: var(--primary) !important;
@@ -151,10 +137,3 @@ body {
   background: var(--primary-dark) !important;
   border-color: var(--primary-dark) !important;
 }
-
-/* ── Print ── */
-@media print {
-  body > * { display: none !important; }
-  #print-report { display: block !important; position: fixed; top: 0; left: 0; width: 100%; z-index: 99999; background: white; }
-}
-#print-report { display: none; }

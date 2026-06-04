@@ -49,7 +49,6 @@ import { FooterComponent } from './components/footer/footer.component';
           <app-result-panel />
         </div>
       </div>
-      <div id="print-report"></div>
       <div class="flex-1"></div>
       <app-footer />
     </div>
