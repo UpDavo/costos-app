@@ -1,11 +1,14 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CalculatorStateService } from '../../services/calculator-state.service';
 import { AppStore } from '../../store/app.store';
 import { BreakdownChartComponent } from './breakdown-chart/breakdown-chart.component';
 import { DepreciationChartComponent } from './depreciation-chart/depreciation-chart.component';
+import { LITERS_PER_GALLON } from '../../services/cost-calculation.service';
 
 interface BreakdownRow { label: string; icon: string; perKm: number; color: string; }
+
+export type DisplayUnit = 'km' | 'liter' | 'gallon';
 
 @Component({
   selector: 'app-result-panel',
@@ -18,6 +21,41 @@ interface BreakdownRow { label: string; icon: string; perKm: number; color: stri
 export class ResultPanelComponent {
   state = inject(CalculatorStateService);
   appStore = inject(AppStore);
+
+  displayUnit = signal<DisplayUnit>('km');
+
+  private kmPerLiter = computed(() => {
+    const f = this.state.fuel();
+    return f.unit === 'kmL' ? f.rendimiento : f.rendimiento / LITERS_PER_GALLON;
+  });
+
+  multiplier = computed(() => {
+    const u = this.displayUnit();
+    if (u === 'liter') return this.kmPerLiter();
+    if (u === 'gallon') return this.kmPerLiter() * LITERS_PER_GALLON;
+    return 1;
+  });
+
+  unitLabel = computed(() => {
+    const u = this.displayUnit();
+    if (u === 'liter') return 'litro';
+    if (u === 'gallon') return 'galón';
+    return 'km';
+  });
+
+  unitTitle = computed(() => {
+    const u = this.displayUnit();
+    if (u === 'liter') return 'por litro de combustible';
+    if (u === 'gallon') return 'por galón de combustible';
+    return 'por kilómetro recorrido';
+  });
+
+  heroFormat = computed(() => this.displayUnit() === 'km' ? '1.3-3' : '1.2-2');
+  rowFormat  = computed(() => this.displayUnit() === 'km' ? '1.4-4' : '1.3-3');
+
+  convert(perKm: number): number {
+    return perKm * this.multiplier();
+  }
 
   breakdownRows = computed((): BreakdownRow[] => {
     const r = this.state.result();

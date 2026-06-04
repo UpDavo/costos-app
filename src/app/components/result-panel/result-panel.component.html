@@ -6,15 +6,27 @@
        style="background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 30px 30px;">
     <div
       class="text-[0.65rem] font-mono tracking-widest uppercase text-white/40 mb-2">
-      Costo total por kilómetro
+      Costo total {{ unitTitle() }}
     </div>
     <div
       class="text-[3rem] font-bold text-white leading-none mb-1 tracking-[-0.02em]">
       <span class="text-[1.6rem] opacity-80">{{ appStore.selectedCountry().currencySymbol }}</span>{{
-      state.result().totalPerKm | number:'1.3-3' }}
+      convert(state.result().totalPerKm) | number:heroFormat() }}
     </div>
-    <div class="text-[0.72rem] text-[var(--primary-light)] font-mono">{{ appStore.selectedCountry().currency }} / km · todos los costos
-      incluidos</div>
+    <div class="text-[0.72rem] text-[var(--primary-light)] font-mono mb-3">{{ appStore.selectedCountry().currency }} / {{ unitLabel() }} · todos los costos incluidos</div>
+    <!-- Unit switch -->
+    <div class="flex justify-center gap-[3px]">
+      @for (opt of ([{id:'km',label:'/ km'},{id:'liter',label:'/ litro'},{id:'gallon',label:'/ galón'}]); track opt.id) {
+        <button
+          class="px-3 py-[4px] text-[0.65rem] font-mono tracking-wide border transition-all duration-150 cursor-pointer"
+          [ngClass]="displayUnit() === opt.id
+            ? 'bg-white text-[#0F0F0F] border-white'
+            : 'bg-transparent text-white/40 border-white/20 hover:border-white/50 hover:text-white/70'"
+          (click)="displayUnit.set($any(opt.id))">
+          {{ opt.label }}
+        </button>
+      }
+    </div>
   </div>
 
   <!-- Breakdown list -->
@@ -38,7 +50,7 @@
         </div>
         <span
           class="text-[0.73rem] font-semibold min-w-[68px] text-right text-[var(--text)]">
-          {{ appStore.selectedCountry().currencySymbol }}{{ row.perKm | number:'1.4-4' }}
+          {{ appStore.selectedCountry().currencySymbol }}{{ convert(row.perKm) | number:rowFormat() }}
         </span>
       </div>
     </div>

@@ -36,6 +36,7 @@ const DEFAULT_VEHICLE: VehicleData = {
   vehicleYear: 2022,
   vehicleValue: 18000,
   residualValue: 4000,
+  purchaseKm: 0,
   annualKm: 20000,
   usefulLife: 8,
   deprMethod: 'accel',

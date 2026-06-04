@@ -7,6 +7,7 @@ export interface VehicleData {
   vehicleYear: number;
   vehicleValue: number;
   residualValue: number;
+  purchaseKm: number;
   annualKm: number;
   usefulLife: number;
   deprMethod: DeprMethod;

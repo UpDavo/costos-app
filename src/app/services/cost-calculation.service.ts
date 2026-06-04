@@ -40,10 +40,21 @@ export class CostCalculationService {
     return (idle.lph * idle.hours * pricePerLiter) / annualKm;
   }
 
-  maintCostPerKm(items: MaintenanceItem[]): number {
+  maintCostPerKm(items: MaintenanceItem[], purchaseKm = 0, totalKm = 0): number {
+    if (totalKm <= 0) {
+      return items
+        .filter((i) => i.enabled && i.every > 0)
+        .reduce((sum, i) => sum + i.cost / i.every, 0);
+    }
     return items
       .filter((i) => i.enabled && i.every > 0)
-      .reduce((sum, i) => sum + i.cost / i.every, 0);
+      .reduce((sum, i) => {
+        const offset = purchaseKm % i.every;
+        const firstDue = offset === 0 ? i.every : i.every - offset;
+        if (firstDue > totalKm) return sum;
+        const count = 1 + Math.floor((totalKm - firstDue) / i.every);
+        return sum + (count * i.cost) / totalKm;
+      }, 0);
   }
 
   deprCostPerKm(v: VehicleData): number {
@@ -83,7 +94,8 @@ export class CostCalculationService {
   ): CostBreakdown {
     const fuelPerKm = this.fuelCostPerKm(fuel);
     const idlePerKm = this.idleCostPerKm(idle, fuel, vehicle.annualKm);
-    const maintPerKm = this.maintCostPerKm(items);
+    const totalKm = vehicle.annualKm * vehicle.usefulLife;
+    const maintPerKm = this.maintCostPerKm(items, vehicle.purchaseKm ?? 0, totalKm);
     const deprPerKm = this.deprCostPerKm(vehicle);
     const insurePerKm = this.insuranceCostPerKm(obligations, vehicle.annualKm);
     const parkPerKm = this.parkingCostPerKm(obligations.parking, vehicle.annualKm);

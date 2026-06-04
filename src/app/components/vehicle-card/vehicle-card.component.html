@@ -160,6 +160,25 @@
   <div class="flex flex-col gap-[5px]">
     <label
       class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+      Odómetro al comprar (km)
+      <app-info-tip
+        text="Kilómetros que tenía el auto cuando lo compraste. Escribe 0 si lo compraste nuevo. Afecta qué mantenimientos aplican desde el inicio." />
+    </label>
+    <p-inputnumber [ngModel]="state.vehicle().purchaseKm"
+      (ngModelChange)="state.patchVehicle({ purchaseKm: $event ?? 0 })"
+      [min]="0" [step]="1000" [useGrouping]="false"
+      inputStyleClass="input-field"
+      placeholder="0 = auto nuevo" />
+    @if (state.vehicle().purchaseKm > 0) {
+      <span class="text-[0.72rem] text-[var(--muted)]">
+        <i class="pi pi-info-circle mr-1"></i>Auto comprado usado · el cálculo de mantenimientos parte desde {{ state.vehicle().purchaseKm | number }} km
+      </span>
+    }
+  </div>
+
+  <div class="flex flex-col gap-[5px]">
+    <label
+      class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
       Método de depreciación
       <app-info-tip
         text="Acelerada: los autos pierden más valor los primeros años (realidad del mercado ecuatoriano). Lineal: pérdida uniforme. Usa Acelerada para autos nuevos." />
