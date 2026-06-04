@@ -1,10 +1,11 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, ElementRef, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CalculatorStateService } from '../../services/calculator-state.service';
 import { AppStore } from '../../store/app.store';
 import { BreakdownChartComponent } from './breakdown-chart/breakdown-chart.component';
 import { DepreciationChartComponent } from './depreciation-chart/depreciation-chart.component';
 import { LITERS_PER_GALLON } from '../../services/cost-calculation.service';
+import { toPng } from 'html-to-image';
 
 interface BreakdownRow { label: string; icon: string; perKm: number; color: string; }
 
@@ -21,6 +22,24 @@ export type DisplayUnit = 'km' | 'liter' | 'gallon' | 'kwh';
 export class ResultPanelComponent {
   state = inject(CalculatorStateService);
   appStore = inject(AppStore);
+
+  panelRef = viewChild<ElementRef>('resultPanel');
+  screenshotLoading = signal(false);
+
+  async takeScreenshot() {
+    const el = this.panelRef()?.nativeElement;
+    if (!el) return;
+    this.screenshotLoading.set(true);
+    try {
+      const dataUrl = await toPng(el, { pixelRatio: 2 });
+      const link = document.createElement('a');
+      link.download = 'costos-vehiculo.png';
+      link.href = dataUrl;
+      link.click();
+    } finally {
+      this.screenshotLoading.set(false);
+    }
+  }
 
   displayUnit = signal<DisplayUnit>('km');
 
