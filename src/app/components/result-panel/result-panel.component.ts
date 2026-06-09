@@ -134,6 +134,13 @@ export class ResultPanelComponent {
 
   vehicleSpecs = this.state.vehicleSpecsBadge;
 
+  headerBg = computed(() => {
+    const v = this.state.vehicle();
+    if (v.isElectric) return '#0a5276';
+    if (v.vehicleType === 'motorcycle') return '#7f1d1d';
+    return '#0F0F0F';
+  });
+
   convert(perKm: number): number {
     return perKm * this.multiplier();
   }

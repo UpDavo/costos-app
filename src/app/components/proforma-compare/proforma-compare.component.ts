@@ -130,6 +130,12 @@ export class ProformaCompareComponent {
     'pi-map-marker': 'rgba(107,114,128,0.1)',
   };
 
+  cardHeaderBg(p: SavedProforma): string {
+    if (p.vehicle.isElectric) return '#0a5276';
+    if (p.vehicle.vehicleType === 'motorcycle') return '#7f1d1d';
+    return '#0F0F0F';
+  }
+
   specsFor(p: SavedProforma): string {
     const v = p.vehicle;
     const isMoto = v.vehicleType === 'motorcycle';
