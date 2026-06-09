@@ -20,6 +20,8 @@ export interface VehicleData {
   annualKm: number;
   usefulLife: number;
   deprMethod: DeprMethod;
+  electricMaintCost: number;
+  electricMaintEvery: number;
 }
 
 export interface FuelData {

@@ -62,6 +62,8 @@ const DEFAULT_VEHICLE: VehicleData = {
   annualKm: 20000,
   usefulLife: 8,
   deprMethod: 'accel',
+  electricMaintCost: 80,
+  electricMaintEvery: 20000,
 };
 
 const DEFAULT_FUEL: FuelData = {
@@ -281,6 +283,7 @@ export class CalculatorStateService {
       this.maintenanceItems.set([...DEFAULT_MAINTENANCE_MOTORCYCLE]);
       this.nextId = 10;
       this.obligations.set({ ...DEFAULT_OBLIGATIONS_MOTORCYCLE });
+      this.vehicle.update((v) => ({ ...v, electricMaintCost: 30, electricMaintEvery: 20000 }));
       if (!isElectric) {
         this.fuel.update((f) => ({
           ...f,
@@ -297,6 +300,7 @@ export class CalculatorStateService {
       this.maintenanceItems.set([...DEFAULT_MAINTENANCE]);
       this.nextId = 14;
       this.obligations.set({ ...DEFAULT_OBLIGATIONS });
+      this.vehicle.update((v) => ({ ...v, electricMaintCost: 80, electricMaintEvery: 20000 }));
       if (!isElectric) {
         const fuelType = this.fuel().type;
         const d = FUEL_DATA[fuelType as keyof typeof FUEL_DATA];

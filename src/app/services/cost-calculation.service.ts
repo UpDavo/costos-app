@@ -43,6 +43,25 @@ export class CostCalculationService {
     return (idle.lph * idle.hours * pricePerLiter) / annualKm;
   }
 
+  electricMaintCostPerKm(v: VehicleData): number {
+    const every = v.electricMaintEvery || 20000;
+    const base = v.electricMaintCost || 0;
+    if (every <= 0 || base <= 0 || v.annualKm <= 0 || v.usefulLife <= 0) return 0;
+    const totalKm = v.annualKm * v.usefulLife;
+    const purchaseKm = v.purchaseKm || 0;
+    const offset = purchaseKm % every;
+    const firstDue = offset === 0 ? every : every - offset;
+    if (firstDue > totalKm) return 0;
+    let totalCost = 0;
+    let kmFromPurchase = firstDue;
+    while (kmFromPurchase <= totalKm) {
+      const eventNum = (purchaseKm + kmFromPurchase) / every; // 1-based absolute
+      totalCost += eventNum % 2 === 1 ? base : base * 1.5;
+      kmFromPurchase += every;
+    }
+    return totalCost / totalKm;
+  }
+
   maintCostPerKm(items: MaintenanceItem[], purchaseKm = 0, totalKm = 0): number {
     if (totalKm <= 0) {
       return items
@@ -98,7 +117,9 @@ export class CostCalculationService {
     const fuelPerKm = this.fuelCostPerKm(fuel);
     const idlePerKm = this.idleCostPerKm(idle, fuel, vehicle.annualKm);
     const totalKm = vehicle.annualKm * vehicle.usefulLife;
-    const maintPerKm = this.maintCostPerKm(items, vehicle.purchaseKm ?? 0, totalKm);
+    const maintPerKm = vehicle.isElectric
+      ? this.electricMaintCostPerKm(vehicle)
+      : this.maintCostPerKm(items, vehicle.purchaseKm ?? 0, totalKm);
     const deprPerKm = this.deprCostPerKm(vehicle);
     const insurePerKm = this.insuranceCostPerKm(obligations, vehicle.annualKm);
     const parkPerKm = this.parkingCostPerKm(obligations.parking, vehicle.annualKm);

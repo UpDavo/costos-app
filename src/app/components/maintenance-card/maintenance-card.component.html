@@ -1,81 +1,154 @@
-<div class="p-4">
-  @for (item of state.maintenanceItems(); track item.id) {
-  <app-maintenance-item
-    [item]="item"
-    [currencySymbol]="appStore.selectedCountry().currencySymbol"
-    [currencyCode]="appStore.selectedCountry().currency"
-    (enabledChange)="state.updateMaintenanceItem(item.id, { enabled: $event })"
-    (costChange)="state.updateMaintenanceItem(item.id, { cost: $event })"
-    (everyChange)="state.updateMaintenanceItem(item.id, { every: $event })"
-    (remove)="state.removeMaintenanceItem(item.id)" />
-  }
-  <button
-    class="flex items-center justify-center gap-[6px] w-full py-[9px] bg-transparent border-[1.5px] border-dashed border-[var(--border2)] rounded-lg text-[var(--muted)] text-[0.78rem] font-medium cursor-pointer transition-all duration-150 mt-1 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary-dim)]"
-    (click)="showDialog.set(true)">
-    <i class="pi pi-plus"></i>
-    Agregar ítem personalizado
-  </button>
-</div>
+<!-- Electric simplified view -->
+@if (state.isElectric()) {
+  <div class="p-4 flex flex-col gap-4">
 
-@if (showDialog()) {
-<div
-  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
-  (click)="closeDialog()">
-  <div
-    class="bg-white rounded-xl shadow-xl w-full max-w-[420px] border border-[var(--border)]"
-    (click)="$event.stopPropagation()">
-
-    <!-- Header -->
-    <div class="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
-      <h2 class="text-[0.95rem] font-semibold text-[var(--text)]">
-        Agregar ítem de mantenimiento
-      </h2>
-      <button
-        class="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--primary-dim)] hover:text-[var(--primary)] transition-colors cursor-pointer"
-        (click)="closeDialog()">
-        <i class="pi pi-times text-sm"></i>
-      </button>
+    <!-- Info banner -->
+    <div class="flex items-start gap-2 bg-[var(--primary-dim)] border border-[var(--primary-dim2)] px-3 py-[10px] text-[0.76rem] text-[var(--primary)]">
+      <i class="pi pi-bolt text-[0.8rem] mt-[1px] shrink-0"></i>
+      <span>
+        Vehículos eléctricos tienen mantenimientos periódicos de costo alternado:
+        <b>1.°  base</b>, <b>2.° +50%</b>, <b>3.° base</b>, <b>4.° +50%</b>…
+      </span>
     </div>
 
-    <!-- Body -->
-    <div class="flex flex-col gap-4 px-5 py-4">
-      <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-medium text-[var(--muted)]">Nombre del servicio</label>
-        <input pInputText [(ngModel)]="newName"
-          placeholder="Ej: Cambio de refrigerante" class="w-full" />
+    <!-- Inputs -->
+    <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
+      <div class="flex flex-col gap-[5px]">
+        <label class="text-[0.78rem] text-[var(--muted)] font-medium">
+          Costo del 1.° mantenimiento ({{ appStore.selectedCountry().currency }})
+        </label>
+        <p-inputnumber
+          [ngModel]="state.vehicle().electricMaintCost"
+          (ngModelChange)="state.patchVehicle({ electricMaintCost: $event ?? 0 })"
+          [min]="0" [step]="10" [useGrouping]="false"
+          inputStyleClass="input-field" />
       </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-medium text-[var(--muted)]">
-            Costo ({{ appStore.selectedCountry().currency }})
-          </label>
-          <p-inputnumber [(ngModel)]="newCost" [min]="1" [step]="1"
-            [useGrouping]="false" inputStyleClass="input-field" />
-        </div>
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-medium text-[var(--muted)]">Cada cuántos km</label>
-          <p-inputnumber [(ngModel)]="newEvery" [min]="100" [step]="100"
-            [useGrouping]="false" inputStyleClass="input-field" />
-        </div>
+      <div class="flex flex-col gap-[5px]">
+        <label class="text-[0.78rem] text-[var(--muted)] font-medium">
+          Cada cuántos km
+        </label>
+        <p-inputnumber
+          [ngModel]="state.vehicle().electricMaintEvery"
+          (ngModelChange)="state.patchVehicle({ electricMaintEvery: $event ?? 1000 })"
+          [min]="1000" [step]="1000" [useGrouping]="false"
+          inputStyleClass="input-field" />
       </div>
     </div>
 
-    <!-- Footer -->
-    <div class="flex items-center justify-end gap-2 px-5 py-3 border-t border-[var(--border)]">
-      <button
-        class="px-4 py-2 rounded-lg text-sm font-medium text-[var(--muted)] hover:bg-[var(--primary-dim)] hover:text-[var(--primary)] transition-colors cursor-pointer"
-        (click)="closeDialog()">
-        Cancelar
-      </button>
-      <button
-        class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-[var(--primary)] hover:bg-[var(--primary-dark)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-        [disabled]="!newName.trim()"
-        (click)="addItem()">
-        <i class="pi pi-plus text-xs"></i>
-        Agregar
-      </button>
-    </div>
+    <!-- Schedule preview -->
+    @if (electricSchedule().length > 0) {
+      <div class="flex flex-col gap-0 border border-[var(--border)]">
+        <div class="flex items-center gap-2 px-3 py-2 border-b border-[var(--border)] bg-[var(--surface2)]">
+          <i class="pi pi-calendar text-[var(--primary)] text-[0.7rem]"></i>
+          <span class="text-[0.65rem] font-mono uppercase tracking-widest text-[var(--muted)]">
+            Mantenimientos durante tu período ({{ state.vehicle().annualKm * state.vehicle().usefulLife | number:'1.0-0' }} km total)
+          </span>
+        </div>
+        @for (ev of electricSchedule(); track ev.km) {
+          <div class="flex items-center justify-between px-3 py-[7px] border-b border-[var(--border)] last:border-b-0 text-[0.78rem]"
+               [ngClass]="ev.isPremium ? 'bg-amber-50' : 'bg-white'">
+            <div class="flex items-center gap-2 text-[var(--muted)]">
+              <span class="w-[6px] h-[6px] rounded-full shrink-0"
+                    [ngClass]="ev.isPremium ? 'bg-amber-400' : 'bg-[var(--primary)]'"></span>
+              <span>{{ ev.km | number:'1.0-0' }} km</span>
+              @if (ev.isPremium) {
+                <span class="text-[0.65rem] font-mono text-amber-600 bg-amber-100 px-[5px] py-[1px]">+50%</span>
+              }
+            </div>
+            <span class="font-semibold" [ngClass]="ev.isPremium ? 'text-amber-700' : 'text-[var(--text)]'">
+              {{ appStore.selectedCountry().currencySymbol }}{{ ev.cost | number:'1.0-0' }}
+            </span>
+          </div>
+        }
+        @if (electricSchedule().length === 8) {
+          <div class="px-3 py-[6px] text-[0.68rem] text-[var(--muted)] font-mono bg-[var(--surface2)] text-center">
+            … continúa con el mismo patrón
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="text-center py-4 text-[0.78rem] text-[var(--muted)] border border-dashed border-[var(--border)]">
+        Ningún mantenimiento dentro del período de uso configurado
+      </div>
+    }
 
   </div>
-</div>
+}
+
+<!-- Regular combustion view -->
+@if (!state.isElectric()) {
+  <div class="p-4">
+    @for (item of state.maintenanceItems(); track item.id) {
+      <app-maintenance-item
+        [item]="item"
+        [currencySymbol]="appStore.selectedCountry().currencySymbol"
+        [currencyCode]="appStore.selectedCountry().currency"
+        (enabledChange)="state.updateMaintenanceItem(item.id, { enabled: $event })"
+        (costChange)="state.updateMaintenanceItem(item.id, { cost: $event })"
+        (everyChange)="state.updateMaintenanceItem(item.id, { every: $event })"
+        (remove)="state.removeMaintenanceItem(item.id)" />
+    }
+    <button
+      class="flex items-center justify-center gap-[6px] w-full py-[9px] bg-transparent border-[1.5px] border-dashed border-[var(--border2)] rounded-lg text-[var(--muted)] text-[0.78rem] font-medium cursor-pointer transition-all duration-150 mt-1 hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary-dim)]"
+      (click)="showDialog.set(true)">
+      <i class="pi pi-plus"></i>
+      Agregar ítem personalizado
+    </button>
+  </div>
+
+  @if (showDialog()) {
+    <div
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+      (click)="closeDialog()">
+      <div
+        class="bg-white rounded-xl shadow-xl w-full max-w-[420px] border border-[var(--border)]"
+        (click)="$event.stopPropagation()">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
+          <h2 class="text-[0.95rem] font-semibold text-[var(--text)]">
+            Agregar ítem de mantenimiento
+          </h2>
+          <button
+            class="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--muted)] hover:bg-[var(--primary-dim)] hover:text-[var(--primary)] transition-colors cursor-pointer"
+            (click)="closeDialog()">
+            <i class="pi pi-times text-sm"></i>
+          </button>
+        </div>
+        <div class="flex flex-col gap-4 px-5 py-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-medium text-[var(--muted)]">Nombre del servicio</label>
+            <input pInputText [(ngModel)]="newName"
+              placeholder="Ej: Cambio de refrigerante" class="w-full" />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-medium text-[var(--muted)]">
+                Costo ({{ appStore.selectedCountry().currency }})
+              </label>
+              <p-inputnumber [(ngModel)]="newCost" [min]="1" [step]="1"
+                [useGrouping]="false" inputStyleClass="input-field" />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-medium text-[var(--muted)]">Cada cuántos km</label>
+              <p-inputnumber [(ngModel)]="newEvery" [min]="100" [step]="100"
+                [useGrouping]="false" inputStyleClass="input-field" />
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center justify-end gap-2 px-5 py-3 border-t border-[var(--border)]">
+          <button
+            class="px-4 py-2 rounded-lg text-sm font-medium text-[var(--muted)] hover:bg-[var(--primary-dim)] hover:text-[var(--primary)] transition-colors cursor-pointer"
+            (click)="closeDialog()">
+            Cancelar
+          </button>
+          <button
+            class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-[var(--primary)] hover:bg-[var(--primary-dark)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+            [disabled]="!newName.trim()"
+            (click)="addItem()">
+            <i class="pi pi-plus text-xs"></i>
+            Agregar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 }
