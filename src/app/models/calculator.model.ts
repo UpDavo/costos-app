@@ -2,13 +2,16 @@ export type FuelType = 'extra' | 'super' | 'diesel' | 'electric';
 export type FuelUnit = 'kmL' | 'kmG';
 export type DeprMethod = 'accel' | 'linear';
 export type Transmission = 'manual' | 'automatic';
+export type VehicleType = 'car' | 'motorcycle';
 
 export interface VehicleData {
+  vehicleType: VehicleType;
   purchasePrice: number;
   vehicleYear: number;
   engineDisplacement: string;
   turbo: boolean;
   isElectric: boolean;
+  isNew: boolean;
   transmission: Transmission;
   vehicleValue: number;
   residualValue: number;

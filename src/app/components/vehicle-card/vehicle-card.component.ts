@@ -37,6 +37,12 @@ export class VehicleCardComponent {
     return (((v.purchasePrice - v.vehicleValue) / v.purchasePrice) * 100).toFixed(1);
   });
 
+  newLossPct = computed(() => {
+    const v = this.state.vehicle();
+    if (v.purchasePrice <= 0) return '0.0';
+    return (((v.purchasePrice - v.residualValue) / v.purchasePrice) * 100).toFixed(1);
+  });
+
   suggestedAnnualKm = computed((): number | null => {
     const v = this.state.vehicle();
     if (v.currentKm <= v.purchaseKm) return null;
