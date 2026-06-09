@@ -114,8 +114,10 @@ export class CostCalculationService {
     obligations: ObligationsData,
     items: MaintenanceItem[]
   ): CostBreakdown {
-    const fuelPerKm = this.fuelCostPerKm(fuel);
-    const idlePerKm = this.idleCostPerKm(idle, fuel, vehicle.annualKm);
+    const fuelPerKm = vehicle.isElectric
+      ? ((fuel.consumptionKwh || 20) * (fuel.pricePerKwh || 0.10)) / 100
+      : this.fuelCostPerKm(fuel);
+    const idlePerKm = vehicle.isElectric ? 0 : this.idleCostPerKm(idle, fuel, vehicle.annualKm);
     const totalKm = vehicle.annualKm * vehicle.usefulLife;
     const maintPerKm = vehicle.isElectric
       ? this.electricMaintCostPerKm(vehicle)

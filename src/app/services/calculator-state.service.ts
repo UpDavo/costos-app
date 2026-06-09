@@ -136,7 +136,11 @@ export class CalculatorStateService {
       if (!raw) return;
       const saved = JSON.parse(raw);
       if (saved.vehicle) this.vehicle.set({ ...DEFAULT_VEHICLE, ...saved.vehicle });
-      if (saved.fuel) this.fuel.set({ ...DEFAULT_FUEL, ...saved.fuel });
+      if (saved.fuel) {
+        const loadedFuel = { ...DEFAULT_FUEL, ...saved.fuel };
+        if (saved.vehicle?.isElectric) loadedFuel.type = 'electric';
+        this.fuel.set(loadedFuel);
+      }
       if (saved.idle) this.idle.set(saved.idle);
       if (saved.obligations) this.obligations.set(saved.obligations);
       if (saved.vehicleLookupQuery) this.vehicleLookupQuery.set(saved.vehicleLookupQuery);
@@ -392,7 +396,9 @@ export class CalculatorStateService {
 
   loadProforma(proforma: import('../models/calculator.model').SavedProforma): void {
     this.vehicle.set({ ...DEFAULT_VEHICLE, ...proforma.vehicle });
-    this.fuel.set({ ...proforma.fuel });
+    const loadedFuel = { ...proforma.fuel };
+    if (proforma.vehicle?.isElectric) loadedFuel.type = 'electric';
+    this.fuel.set(loadedFuel);
     this.idle.set({ ...proforma.idle });
     this.obligations.set({ ...proforma.obligations });
     this.maintenanceItems.set([...proforma.maintenanceItems]);
