@@ -122,7 +122,7 @@ export class CostCalculationService {
     const maintPerKm = vehicle.isElectric
       ? this.electricMaintCostPerKm(vehicle)
       : this.maintCostPerKm(items, vehicle.purchaseKm ?? 0, totalKm);
-    const deprPerKm = this.deprCostPerKm(vehicle);
+    const deprPerKm = vehicle.includeDepr !== false ? this.deprCostPerKm(vehicle) : 0;
     const insurePerKm = this.insuranceCostPerKm(obligations, vehicle.annualKm);
     const parkPerKm = this.parkingCostPerKm(obligations.parking, vehicle.annualKm);
     const totalPerKm = fuelPerKm + idlePerKm + maintPerKm + deprPerKm + insurePerKm + parkPerKm;

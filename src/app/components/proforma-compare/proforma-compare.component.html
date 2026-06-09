@@ -56,7 +56,7 @@
     }
 
     <!-- Comparison section -->
-    @if (selectedProformas().length > 0) {
+    @if (proformaCharts().length > 0) {
       <!-- Download button -->
       <div class="flex justify-end mb-3">
         <button
@@ -72,86 +72,94 @@
       <div #compareGrid
         class="grid gap-4 p-4 bg-[var(--bg)]"
         [ngClass]="{
-          'grid-cols-1': selectedProformas().length === 1,
-          'grid-cols-1 min-[640px]:grid-cols-2': selectedProformas().length === 2,
-          'grid-cols-1 min-[640px]:grid-cols-2 min-[900px]:grid-cols-3': selectedProformas().length === 3
+          'grid-cols-1': proformaCharts().length === 1,
+          'grid-cols-1 min-[640px]:grid-cols-2': proformaCharts().length === 2,
+          'grid-cols-1 min-[640px]:grid-cols-2 min-[900px]:grid-cols-3': proformaCharts().length === 3
         }">
-        @for (p of selectedProformas(); track p.id; let i = $index) {
+        @for (charts of proformaCharts(); track charts.id) {
           <div class="bg-white border border-[var(--border)] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.07)] flex flex-col">
 
             <!-- Card header (dark) -->
             <div class="relative px-4 py-4 text-center"
-                 [style.background-color]="cardHeaderBg(p)"
+                 [style.background-color]="cardHeaderBg(charts.proforma)"
                  style="background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 24px 24px;">
               <button
                 class="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-white/30 hover:text-red-400 transition-colors cursor-pointer"
-                (click)="deleteProforma(p.id, $event)"
+                (click)="deleteProforma(charts.id, $event)"
                 title="Eliminar configuración">
                 <i class="pi pi-times text-[0.65rem]"></i>
               </button>
 
               <div class="text-[0.6rem] font-mono tracking-widest uppercase text-white/40 mb-1">costo total / km</div>
               <div class="text-[2rem] font-bold text-white leading-none mb-[2px] tracking-[-0.02em]">
-                <span class="text-[1.1rem] opacity-70">{{ p.currencySymbol }}</span>{{ p.result.totalPerKm | number:'1.3-3' }}
+                <span class="text-[1.1rem] opacity-70">{{ charts.proforma.currencySymbol }}</span>{{ charts.result.totalPerKm | number:'1.3-3' }}
               </div>
-              <div class="text-[0.65rem] text-[var(--primary-light)] font-mono mb-2">{{ p.currency }} / km</div>
+              <div class="text-[0.65rem] text-[var(--primary-light)] font-mono mb-2">{{ charts.proforma.currency }} / km</div>
 
-              <div class="text-[0.82rem] font-semibold text-white/90 leading-tight px-2 truncate" title="{{ p.name }}">
-                {{ p.name }}
+              <div class="text-[0.82rem] font-semibold text-white/90 leading-tight px-2 truncate" title="{{ charts.proforma.name }}">
+                {{ charts.proforma.name }}
               </div>
 
               <div class="mt-2 flex justify-center gap-[4px] flex-wrap">
-                @if (p.vehicle.vehicleType === 'motorcycle') {
+                @if (charts.proforma.vehicle.vehicleType === 'motorcycle') {
                   <span class="text-[0.55rem] font-mono bg-white/10 text-white/60 px-[6px] py-[1px]"><i class="pi pi-cog mr-[3px]"></i>MOTO</span>
                 }
-                @if (p.vehicle.isElectric) {
+                @if (charts.proforma.vehicle.isElectric) {
                   <span class="text-[0.55rem] font-mono bg-[var(--primary)]/20 text-[var(--primary-light)] px-[6px] py-[1px]"><i class="pi pi-bolt mr-[3px]"></i>ELÉCTRICO</span>
                 }
-                @if (p.vehicle.engineDisplacement && !p.vehicle.isElectric) {
+                @if (charts.proforma.vehicle.engineDisplacement && !charts.proforma.vehicle.isElectric) {
                   <span class="text-[0.55rem] font-mono bg-white/10 text-white/60 px-[6px] py-[1px]">
-                    {{ p.vehicle.engineDisplacement }}{{ p.vehicle.vehicleType === 'motorcycle' ? 'cc' : 'L' }}
+                    {{ charts.proforma.vehicle.engineDisplacement }}{{ charts.proforma.vehicle.vehicleType === 'motorcycle' ? 'cc' : 'L' }}
                   </span>
                 }
-                @if (p.vehicle.turbo && !p.vehicle.isElectric && p.vehicle.vehicleType !== 'motorcycle') {
+                @if (charts.proforma.vehicle.turbo && !charts.proforma.vehicle.isElectric && charts.proforma.vehicle.vehicleType !== 'motorcycle') {
                   <span class="text-[0.55rem] font-mono bg-white/10 text-white/60 px-[6px] py-[1px]">TURBO</span>
                 }
                 <span class="text-[0.55rem] font-mono bg-white/10 text-white/60 px-[6px] py-[1px]">
-                  {{ p.vehicle.transmission === 'manual' ? 'MANUAL' : 'AUTO' }}
+                  {{ charts.proforma.vehicle.transmission === 'manual' ? 'MANUAL' : 'AUTO' }}
                 </span>
-                @if (p.vehicle.vehicleYear) {
-                  <span class="text-[0.55rem] font-mono bg-white/10 text-white/60 px-[6px] py-[1px]">{{ p.vehicle.vehicleYear }}</span>
+                @if (charts.proforma.vehicle.vehicleYear) {
+                  <span class="text-[0.55rem] font-mono bg-white/10 text-white/60 px-[6px] py-[1px]">{{ charts.proforma.vehicle.vehicleYear }}</span>
                 }
+                <!-- Depr toggle tag -->
+                <button
+                  class="text-[0.55rem] font-mono px-[6px] py-[1px] border cursor-pointer transition-all duration-150"
+                  [ngClass]="charts.includeDepr
+                    ? 'bg-white/10 border-white/20 text-white/60 hover:bg-red-500/20 hover:border-red-400/50 hover:text-red-300'
+                    : 'bg-red-500/20 border-red-400/50 text-red-300 hover:bg-white/10 hover:border-white/20 hover:text-white/60'"
+                  (click)="toggleDeprFor(charts.id); $event.stopPropagation()">
+                  <i class="pi mr-[3px]" [ngClass]="charts.includeDepr ? 'pi-eye' : 'pi-eye-slash'"></i>
+                  {{ charts.includeDepr ? 'CON DEVALÚO' : 'SIN DEVALÚO' }}
+                </button>
               </div>
             </div>
 
             <!-- Donut chart: distribución -->
-            @if (proformaCharts()[i]; as charts) {
-              <div class="px-4 pt-3 pb-2 border-b border-[var(--border)]">
-                <div class="flex items-center gap-[5px] text-[0.65rem] font-mono font-semibold tracking-widest uppercase text-[var(--muted)] mb-2">
-                  <i class="pi pi-chart-pie text-[var(--primary)] text-[0.7rem]"></i>
-                  Distribución
-                </div>
-                <div class="flex items-center gap-3">
-                  <p-chart type="doughnut"
-                    [data]="charts.breakdown"
-                    [options]="breakdownChartOptions"
-                    [style]="{ width: '84px', height: '84px', flexShrink: '0' }" />
-                  <div class="flex flex-col gap-[4px] flex-1 min-w-0">
-                    @for (item of charts.legend; track item.label) {
-                      <div class="flex items-center gap-[5px] text-[0.65rem] text-[var(--muted)]">
-                        <span class="w-[7px] h-[7px] shrink-0" [style.background]="item.color"></span>
-                        <span class="flex-1 truncate">{{ item.label }}</span>
-                        <span class="font-semibold text-[0.63rem] text-[var(--text)] shrink-0">{{ item.pct }}%</span>
-                      </div>
-                    }
-                  </div>
+            <div class="px-4 pt-3 pb-2 border-b border-[var(--border)]">
+              <div class="flex items-center gap-[5px] text-[0.65rem] font-mono font-semibold tracking-widest uppercase text-[var(--muted)] mb-2">
+                <i class="pi pi-chart-pie text-[var(--primary)] text-[0.7rem]"></i>
+                Distribución
+              </div>
+              <div class="flex items-center gap-3">
+                <p-chart type="doughnut"
+                  [data]="charts.breakdown"
+                  [options]="breakdownChartOptions"
+                  [style]="{ width: '84px', height: '84px', flexShrink: '0' }" />
+                <div class="flex flex-col gap-[4px] flex-1 min-w-0">
+                  @for (item of charts.legend; track item.label) {
+                    <div class="flex items-center gap-[5px] text-[0.65rem] text-[var(--muted)]">
+                      <span class="w-[7px] h-[7px] shrink-0" [style.background]="item.color"></span>
+                      <span class="flex-1 truncate">{{ item.label }}</span>
+                      <span class="font-semibold text-[0.63rem] text-[var(--text)] shrink-0">{{ item.pct }}%</span>
+                    </div>
+                  }
                 </div>
               </div>
-            }
+            </div>
 
             <!-- Breakdown rows -->
             <div class="px-4 py-3 flex-1">
-              @for (row of breakdownRowsFor(p); track row.label) {
+              @for (row of charts.rows; track row.label) {
                 <div class="flex justify-between items-center py-[6px] border-b border-[var(--border)] last:border-b-0">
                   <div class="flex items-center gap-[6px] text-[0.72rem] text-[var(--muted)]">
                     <div class="w-5 h-5 flex items-center justify-center text-[0.65rem]"
@@ -162,14 +170,14 @@
                   </div>
                   <div class="flex items-center gap-[6px]">
                     <div class="w-[36px] h-[3px] bg-[var(--border)] overflow-hidden">
-                      <div class="h-full" [style.width.%]="pct(row.perKm, p.result)" [style.background]="row.color"></div>
+                      <div class="h-full" [style.width.%]="pct(row.perKm, charts.result.totalPerKm)" [style.background]="row.color"></div>
                     </div>
                     <div class="text-right min-w-[64px]">
                       <div class="text-[0.72rem] font-bold text-[var(--text)]">
-                        {{ p.currencySymbol }}{{ row.perKm * p.vehicle.annualKm | number:'1.0-0' }}<span class="text-[0.58rem] font-normal text-[var(--muted)]">/año</span>
+                        {{ charts.proforma.currencySymbol }}{{ row.perKm * charts.proforma.vehicle.annualKm | number:'1.0-0' }}<span class="text-[0.58rem] font-normal text-[var(--muted)]">/año</span>
                       </div>
                       <div class="text-[0.6rem] text-[var(--muted)] font-mono leading-tight">
-                        {{ p.currencySymbol }}{{ row.perKm | number:'1.4-4' }}/km
+                        {{ charts.proforma.currencySymbol }}{{ row.perKm | number:'1.4-4' }}/km
                       </div>
                     </div>
                   </div>
@@ -184,7 +192,7 @@
                   <i class="pi pi-calendar mr-1"></i>Anual
                 </div>
                 <div class="text-[0.88rem] font-bold text-[var(--primary)]">
-                  {{ p.currencySymbol }}{{ p.result.annualTotal | number:'1.0-0' }}
+                  {{ charts.proforma.currencySymbol }}{{ charts.result.annualTotal | number:'1.0-0' }}
                 </div>
               </div>
               <div class="bg-[var(--surface2)] border border-[var(--border)] p-2">
@@ -192,7 +200,7 @@
                   <i class="pi pi-calendar-minus mr-1"></i>Mensual
                 </div>
                 <div class="text-[0.88rem] font-bold text-[var(--text)]">
-                  {{ p.currencySymbol }}{{ p.result.monthlyTotal | number:'1.0-0' }}
+                  {{ charts.proforma.currencySymbol }}{{ charts.result.monthlyTotal | number:'1.0-0' }}
                 </div>
               </div>
               <div class="bg-[var(--surface2)] border border-[var(--border)] p-2">
@@ -200,7 +208,7 @@
                   <i class="pi pi-sun mr-1"></i>Diario
                 </div>
                 <div class="text-[0.88rem] font-bold text-[var(--text)]">
-                  {{ p.currencySymbol }}{{ p.result.dailyTotal | number:'1.2-2' }}
+                  {{ charts.proforma.currencySymbol }}{{ charts.result.dailyTotal | number:'1.2-2' }}
                 </div>
               </div>
               <div class="bg-[var(--surface2)] border border-[var(--border)] p-2">
@@ -208,60 +216,58 @@
                   <i class="pi pi-map mr-1"></i>Km / año
                 </div>
                 <div class="text-[0.88rem] font-bold text-[var(--text)]">
-                  {{ p.vehicle.annualKm | number:'1.0-0' }}
+                  {{ charts.proforma.vehicle.annualKm | number:'1.0-0' }}
                 </div>
               </div>
             </div>
 
             <!-- Depreciation chart -->
-            @if (proformaCharts()[i]; as charts) {
-              <div class="mx-4 mb-3 bg-[var(--surface2)] border border-[var(--border)] p-3">
-                <div class="flex items-center justify-between mb-2">
-                  <div class="flex items-center gap-[5px] text-[0.65rem] font-mono font-semibold tracking-widest uppercase text-[var(--muted)]">
-                    <i class="pi pi-chart-line text-[var(--primary)] text-[0.7rem]"></i>
-                    Depreciación
-                  </div>
-                  <div class="flex gap-2">
-                    <span class="flex items-center gap-[4px] text-[0.6rem] text-[var(--muted)]">
-                      <span class="inline-block w-[14px] h-[2px] bg-[#9ca3af]"></span>Pasado
-                    </span>
-                    <span class="flex items-center gap-[4px] text-[0.6rem] text-[var(--muted)]">
-                      <span class="inline-block w-[14px] h-[2px] bg-[var(--primary)]"></span>Proyección
-                    </span>
-                  </div>
+            <div class="mx-4 mb-3 bg-[var(--surface2)] border border-[var(--border)] p-3">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-[5px] text-[0.65rem] font-mono font-semibold tracking-widest uppercase text-[var(--muted)]">
+                  <i class="pi pi-chart-line text-[var(--primary)] text-[0.7rem]"></i>
+                  Depreciación
                 </div>
-                <div class="grid grid-cols-3 gap-[4px] mb-2">
-                  <div class="bg-white border border-[var(--border)] p-[6px] text-center">
-                    <div class="text-[0.55rem] text-[var(--muted)] font-mono uppercase tracking-widest mb-[2px]">Compra</div>
-                    <div class="text-[0.75rem] font-semibold text-[var(--text)]">
-                      {{ p.currencySymbol }}{{ charts.deprValues.purchase | number:'1.0-0' }}
-                    </div>
-                  </div>
-                  <div class="bg-[var(--primary-dim)] border border-[var(--primary)] p-[6px] text-center">
-                    <div class="text-[0.55rem] text-[var(--muted)] font-mono uppercase tracking-widest mb-[2px]">Hoy</div>
-                    <div class="text-[0.75rem] font-semibold text-[var(--primary)]">
-                      {{ p.currencySymbol }}{{ charts.deprValues.current | number:'1.0-0' }}
-                    </div>
-                  </div>
-                  <div class="bg-[#fff5f5] border border-[#fca5a5] p-[6px] text-center">
-                    <div class="text-[0.55rem] text-[var(--muted)] font-mono uppercase tracking-widest mb-[2px]">Residual</div>
-                    <div class="text-[0.75rem] font-semibold text-[var(--red)]">
-                      {{ p.currencySymbol }}{{ charts.deprValues.residual | number:'1.0-0' }}
-                    </div>
-                  </div>
+                <div class="flex gap-2">
+                  <span class="flex items-center gap-[4px] text-[0.6rem] text-[var(--muted)]">
+                    <span class="inline-block w-[14px] h-[2px] bg-[#9ca3af]"></span>Pasado
+                  </span>
+                  <span class="flex items-center gap-[4px] text-[0.6rem] text-[var(--muted)]">
+                    <span class="inline-block w-[14px] h-[2px] bg-[var(--primary)]"></span>Proyección
+                  </span>
                 </div>
-                <p-chart type="line"
-                  [data]="charts.deprData"
-                  [options]="charts.deprOptions"
-                  [style]="{ height: '110px' }" />
               </div>
-            }
+              <div class="grid grid-cols-3 gap-[4px] mb-2">
+                <div class="bg-white border border-[var(--border)] p-[6px] text-center">
+                  <div class="text-[0.55rem] text-[var(--muted)] font-mono uppercase tracking-widest mb-[2px]">Compra</div>
+                  <div class="text-[0.75rem] font-semibold text-[var(--text)]">
+                    {{ charts.proforma.currencySymbol }}{{ charts.deprValues.purchase | number:'1.0-0' }}
+                  </div>
+                </div>
+                <div class="bg-[var(--primary-dim)] border border-[var(--primary)] p-[6px] text-center">
+                  <div class="text-[0.55rem] text-[var(--muted)] font-mono uppercase tracking-widest mb-[2px]">Hoy</div>
+                  <div class="text-[0.75rem] font-semibold text-[var(--primary)]">
+                    {{ charts.proforma.currencySymbol }}{{ charts.deprValues.current | number:'1.0-0' }}
+                  </div>
+                </div>
+                <div class="bg-[#fff5f5] border border-[#fca5a5] p-[6px] text-center">
+                  <div class="text-[0.55rem] text-[var(--muted)] font-mono uppercase tracking-widest mb-[2px]">Residual</div>
+                  <div class="text-[0.75rem] font-semibold text-[var(--red)]">
+                    {{ charts.proforma.currencySymbol }}{{ charts.deprValues.residual | number:'1.0-0' }}
+                  </div>
+                </div>
+              </div>
+              <p-chart type="line"
+                [data]="charts.deprData"
+                [options]="charts.deprOptions"
+                [style]="{ height: '110px' }" />
+            </div>
 
             <!-- Load config button -->
             <div class="px-4 pb-4">
               <button
                 class="w-full py-[8px] px-3 border border-[var(--border2)] text-[var(--muted)] text-[0.75rem] font-medium cursor-pointer transition-all duration-150 flex items-center justify-center gap-2 hover:border-[var(--primary)] hover:text-[var(--primary)] bg-transparent"
-                (click)="loadConfig(p)">
+                (click)="loadConfig(charts.proforma)">
                 <i class="pi pi-upload text-[0.7rem]"></i>
                 Cargar en calculadora
               </button>

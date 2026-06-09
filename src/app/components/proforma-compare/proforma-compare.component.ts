@@ -34,23 +34,41 @@ export class ProformaCompareComponent {
   downloadLoading = signal(false);
 
   selectedIds = signal<string[]>([]);
+  deprExcluded = signal<Set<string>>(new Set());
 
   selectedProformas = computed(() => {
     const ids = this.selectedIds();
     return this.storage.proformas().filter((p) => ids.includes(p.id));
   });
 
-  /** Precomputed chart data per selected proforma (avoids per-change-detection recompute) */
-  proformaCharts = computed(() =>
-    this.selectedProformas().map((p) => ({
-      id: p.id,
-      breakdown: this.buildBreakdownChart(p),
-      deprData: this.buildDeprData(p),
-      deprOptions: this.buildDeprOptions(p),
-      deprValues: { purchase: p.vehicle.purchasePrice, current: p.vehicle.vehicleValue, residual: p.vehicle.residualValue },
-      legend: this.buildLegend(p),
-    }))
-  );
+  proformaCharts = computed(() => {
+    const excluded = this.deprExcluded();
+    return this.selectedProformas().map((p) => {
+      const includeDepr = !excluded.has(p.id);
+      const vehicle = { ...p.vehicle, includeDepr };
+      const result = this.calc.calculate(vehicle, p.fuel, p.idle, p.obligations, p.maintenanceItems);
+      return {
+        proforma: p,
+        id: p.id,
+        result,
+        includeDepr,
+        rows: this.buildBreakdownRows(result),
+        breakdown: this.buildBreakdownChart(result),
+        legend: this.buildLegend(result),
+        deprData: this.buildDeprData(p),
+        deprOptions: this.buildDeprOptions(p),
+        deprValues: { purchase: p.vehicle.purchasePrice, current: p.vehicle.vehicleValue, residual: p.vehicle.residualValue },
+      };
+    });
+  });
+
+  toggleDeprFor(id: string): void {
+    this.deprExcluded.update((s) => {
+      const next = new Set(s);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
 
   readonly breakdownChartOptions = {
     cutout: '65%',
@@ -79,8 +97,7 @@ export class ProformaCompareComponent {
     this.storage.delete(id);
   }
 
-  breakdownRowsFor(p: SavedProforma): BreakdownRow[] {
-    const r = p.result;
+  buildBreakdownRows(r: CostBreakdown): BreakdownRow[] {
     return [
       { label: 'Combustible', icon: 'pi-bolt', perKm: r.fuelPerKm + r.idlePerKm, color: '#443FE9' },
       { label: 'Mantenimiento', icon: 'pi-wrench', perKm: r.maintPerKm, color: '#6B67FF' },
@@ -90,8 +107,8 @@ export class ProformaCompareComponent {
     ];
   }
 
-  pct(perKm: number, result: CostBreakdown): number {
-    return Math.min((perKm / (result.totalPerKm || 1)) * 100, 100);
+  pct(perKm: number, total: number): number {
+    return Math.min((perKm / (total || 1)) * 100, 100);
   }
 
   loadConfig(p: SavedProforma): void {
@@ -153,8 +170,7 @@ export class ProformaCompareComponent {
 
   // ── chart builders ────────────────────────────────────────────────────────
 
-  private buildBreakdownChart(p: SavedProforma) {
-    const r = p.result;
+  private buildBreakdownChart(r: CostBreakdown) {
     const vals = [r.fuelPerKm + r.idlePerKm, r.maintPerKm, r.deprPerKm, r.insurePerKm, r.parkPerKm];
     const total = vals.reduce((a, b) => a + b, 0) || 1;
     return {
@@ -167,8 +183,7 @@ export class ProformaCompareComponent {
     };
   }
 
-  private buildLegend(p: SavedProforma) {
-    const r = p.result;
+  private buildLegend(r: CostBreakdown) {
     const vals = [r.fuelPerKm + r.idlePerKm, r.maintPerKm, r.deprPerKm, r.insurePerKm, r.parkPerKm];
     const total = vals.reduce((a, b) => a + b, 0) || 1;
     return CATEGORIES.map((c, i) => ({

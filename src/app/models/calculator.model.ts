@@ -22,6 +22,7 @@ export interface VehicleData {
   deprMethod: DeprMethod;
   electricMaintCost: number;
   electricMaintEvery: number;
+  includeDepr: boolean;
 }
 
 export interface FuelData {

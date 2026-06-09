@@ -64,6 +64,7 @@ const DEFAULT_VEHICLE: VehicleData = {
   deprMethod: 'accel',
   electricMaintCost: 80,
   electricMaintEvery: 20000,
+  includeDepr: true,
 };
 
 const DEFAULT_FUEL: FuelData = {
