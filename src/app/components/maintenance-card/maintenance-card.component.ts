@@ -34,7 +34,7 @@ export class MaintenanceCardComponent {
     while (km <= totalKm && events.length < 8) {
       const eventNum = (purchaseKm + km) / every;
       const isPremium = eventNum % 2 === 0;
-      events.push({ km, cost: isPremium ? base * 1.5 : base, isPremium });
+      events.push({ km, cost: isPremium ? base * 2 : base, isPremium });
       km += every;
     }
     return events;

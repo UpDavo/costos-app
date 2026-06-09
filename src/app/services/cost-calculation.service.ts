@@ -56,7 +56,7 @@ export class CostCalculationService {
     let kmFromPurchase = firstDue;
     while (kmFromPurchase <= totalKm) {
       const eventNum = (purchaseKm + kmFromPurchase) / every; // 1-based absolute
-      totalCost += eventNum % 2 === 1 ? base : base * 1.5;
+      totalCost += eventNum % 2 === 1 ? base : base * 2;
       kmFromPurchase += every;
     }
     return totalCost / totalKm;

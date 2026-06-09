@@ -7,7 +7,7 @@
       <i class="pi pi-bolt text-[0.8rem] mt-[1px] shrink-0"></i>
       <span>
         Vehículos eléctricos tienen mantenimientos periódicos de costo alternado:
-        <b>1.°  base</b>, <b>2.° +50%</b>, <b>3.° base</b>, <b>4.° +50%</b>…
+        <b>1.° base</b>, <b>2.° ×2</b>, <b>3.° base</b>, <b>4.° ×2</b>…
       </span>
     </div>
 
@@ -52,7 +52,7 @@
                     [ngClass]="ev.isPremium ? 'bg-amber-400' : 'bg-[var(--primary)]'"></span>
               <span>{{ ev.km | number:'1.0-0' }} km</span>
               @if (ev.isPremium) {
-                <span class="text-[0.65rem] font-mono text-amber-600 bg-amber-100 px-[5px] py-[1px]">+50%</span>
+                <span class="text-[0.65rem] font-mono text-amber-600 bg-amber-100 px-[5px] py-[1px]">×2</span>
               }
             </div>
             <span class="font-semibold" [ngClass]="ev.isPremium ? 'text-amber-700' : 'text-[var(--text)]'">
