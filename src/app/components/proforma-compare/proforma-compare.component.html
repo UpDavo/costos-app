@@ -90,11 +90,24 @@
                 <i class="pi pi-times text-[0.65rem]"></i>
               </button>
 
-              <div class="text-[0.6rem] font-mono tracking-widest uppercase text-white/40 mb-1">costo total / km</div>
+              <div class="text-[0.6rem] font-mono tracking-widest uppercase text-white/40 mb-1">costo total / {{ charts.unitLabel }}</div>
               <div class="text-[2rem] font-bold text-white leading-none mb-[2px] tracking-[-0.02em]">
-                <span class="text-[1.1rem] opacity-70">{{ charts.proforma.currencySymbol }}</span>{{ charts.result.totalPerKm | number:'1.3-3' }}
+                <span class="text-[1.1rem] opacity-70">{{ charts.proforma.currencySymbol }}</span>{{ charts.result.totalPerKm * charts.multiplier | number:'1.3-3' }}
               </div>
-              <div class="text-[0.65rem] text-[var(--primary-light)] font-mono mb-2">{{ charts.proforma.currency }} / km</div>
+              <div class="text-[0.65rem] text-[var(--primary-light)] font-mono mb-2">{{ charts.proforma.currency }} / {{ charts.unitLabel }}</div>
+              <!-- Unit toggle -->
+              <div class="flex justify-center gap-[3px] mb-2">
+                @for (opt of charts.unitOptions; track opt.id) {
+                  <button
+                    class="px-2 py-[3px] text-[0.58rem] font-mono tracking-wide border transition-all duration-150 cursor-pointer"
+                    [ngClass]="charts.unit === opt.id
+                      ? 'bg-white text-[#0F0F0F] border-white'
+                      : 'bg-transparent text-white/40 border-white/20 hover:border-white/50 hover:text-white/70'"
+                    (click)="setCardUnit(charts.id, opt.id); $event.stopPropagation()">
+                    {{ opt.label }}
+                  </button>
+                }
+              </div>
 
               <div class="text-[0.82rem] font-semibold text-white/90 leading-tight px-2 truncate" title="{{ charts.proforma.name }}">
                 {{ charts.proforma.name }}

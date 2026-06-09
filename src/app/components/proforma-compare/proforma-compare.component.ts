@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ChartModule } from 'primeng/chart';
 import { ProformaStorageService } from '../../services/proforma-storage.service';
 import { CalculatorStateService } from '../../services/calculator-state.service';
-import { CostCalculationService, CURRENT_YEAR } from '../../services/cost-calculation.service';
+import { CostCalculationService, CURRENT_YEAR, LITERS_PER_GALLON } from '../../services/cost-calculation.service';
 import { AppStore } from '../../store/app.store';
 import { SavedProforma, CostBreakdown } from '../../models/calculator.model';
 import { toPng } from 'html-to-image';
@@ -35,6 +35,7 @@ export class ProformaCompareComponent {
 
   selectedIds = signal<string[]>([]);
   deprExcluded = signal<Set<string>>(new Set());
+  cardUnits = signal<Record<string, string>>({});
 
   selectedProformas = computed(() => {
     const ids = this.selectedIds();
@@ -43,15 +44,31 @@ export class ProformaCompareComponent {
 
   proformaCharts = computed(() => {
     const excluded = this.deprExcluded();
+    const units = this.cardUnits();
     return this.selectedProformas().map((p) => {
       const includeDepr = !excluded.has(p.id);
       const vehicle = { ...p.vehicle, includeDepr };
       const result = this.calc.calculate(vehicle, p.fuel, p.idle, p.obligations, p.maintenanceItems);
+      const isElectric = p.vehicle.isElectric;
+      const unit = units[p.id] || 'km';
+      const kmPerLiter = p.fuel.unit === 'kmL' ? p.fuel.rendimiento : p.fuel.rendimiento / LITERS_PER_GALLON;
+      const multiplier =
+        unit === 'liter'  ? kmPerLiter :
+        unit === 'gallon' ? kmPerLiter * LITERS_PER_GALLON :
+        unit === 'kwh'    ? 100 / (p.fuel.consumptionKwh || 20) : 1;
+      const unitLabel = unit === 'liter' ? 'litro' : unit === 'gallon' ? 'galón' : unit === 'kwh' ? 'kWh' : 'km';
+      const unitOptions = isElectric
+        ? [{ id: 'km', label: '/ km' }, { id: 'kwh', label: '/ kWh' }]
+        : [{ id: 'km', label: '/ km' }, { id: 'liter', label: '/ litro' }, { id: 'gallon', label: '/ galón' }];
       return {
         proforma: p,
         id: p.id,
         result,
         includeDepr,
+        unit,
+        multiplier,
+        unitLabel,
+        unitOptions,
         rows: this.buildBreakdownRows(result),
         breakdown: this.buildBreakdownChart(result),
         legend: this.buildLegend(result),
@@ -61,6 +78,10 @@ export class ProformaCompareComponent {
       };
     });
   });
+
+  setCardUnit(id: string, unit: string): void {
+    this.cardUnits.update((u) => ({ ...u, [id]: unit }));
+  }
 
   toggleDeprFor(id: string): void {
     this.deprExcluded.update((s) => {
