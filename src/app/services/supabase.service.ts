@@ -4,6 +4,7 @@ import type { CommunityVehicle, FuelData, IdleData, MaintenanceItem, Obligations
 import { environment } from '../../environments/environment';
 
 const TABLE = 'community_vehicles';
+const VIEW  = 'community_vehicles_latest';
 const SAVE_COOLDOWN_MS = 60_000; // 1 save per minute per session
 
 @Injectable({ providedIn: 'root' })
@@ -13,7 +14,7 @@ export class SupabaseService {
 
   async getRecent(countryCode: string, limit = 10): Promise<CommunityVehicle[]> {
     const { data, error } = await this.client
-      .from(TABLE)
+      .from(VIEW)
       .select('*')
       .eq('country_code', countryCode)
       .order('created_at', { ascending: false })
@@ -24,7 +25,7 @@ export class SupabaseService {
 
   async search(countryCode: string, make: string, model?: string): Promise<CommunityVehicle[]> {
     let query = this.client
-      .from(TABLE)
+      .from(VIEW)
       .select('*')
       .eq('country_code', countryCode)
       .ilike('make', make);
