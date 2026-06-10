@@ -35,7 +35,7 @@ export class ResultPanelComponent {
   saveResult = signal<'success' | 'full' | null>(null);
 
   openSaveForm(): void {
-    this.saveName.set(this.state.vehicleLookupQuery() || 'Mi vehículo');
+    this.saveName.set('Mi vehículo');
     this.saveFormOpen.set(true);
     this.saveResult.set(null);
   }
@@ -57,7 +57,7 @@ export class ResultPanelComponent {
       idle: this.state.idle(),
       obligations: this.state.obligations(),
       maintenanceItems: this.state.maintenanceItems(),
-      vehicleLookupQuery: this.state.vehicleLookupQuery(),
+      vehicleLookupQuery: '',
       result: this.state.result(),
     });
     if (saved) {
