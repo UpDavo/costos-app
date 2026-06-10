@@ -5,7 +5,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { CalculatorStateService } from '../../services/calculator-state.service';
 import { CURRENT_YEAR } from '../../services/cost-calculation.service';
 import { AppStore } from '../../store/app.store';
-import { VehicleLookupService } from '../../services/vehicle-lookup.service';
+// import { VehicleLookupService } from '../../services/vehicle-lookup.service';
 import { InfoTooltipComponent } from '../shared/info-tooltip.component';
 @Component({
   selector: 'app-vehicle-card',
@@ -15,10 +15,9 @@ import { InfoTooltipComponent } from '../shared/info-tooltip.component';
 export class VehicleCardComponent {
   state = inject(CalculatorStateService);
   appStore = inject(AppStore);
-  private vehicleLookup = inject(VehicleLookupService);
-
-  lookupError = signal('');
-  isLookingUp = signal(false);
+  // private vehicleLookup = inject(VehicleLookupService);
+  // lookupError = signal('');
+  // isLookingUp = signal(false);
 
   readonly yearOptions: number[] = Array.from(
     { length: CURRENT_YEAR + 1 - 1990 + 1 },
@@ -50,23 +49,22 @@ export class VehicleCardComponent {
     return Math.round((v.currentKm - v.purchaseKm) / elapsed);
   });
 
-  async searchVehicle() {
-    const query = this.state.vehicleLookupQuery().trim();
-    if (!query || this.isLookingUp()) return;
-
-    this.lookupError.set('');
-    this.isLookingUp.set(true);
-    try {
-      const result = await this.vehicleLookup.search(query);
-      this.state.setVehicleLookupResult(result);
-      if (result.year) {
-        this.state.patchVehicle({ vehicleYear: result.year });
-      }
-    } catch (error) {
-      this.state.setVehicleLookupResult(null);
-      this.lookupError.set(error instanceof Error ? error.message : 'No pude consultar el vehículo.');
-    } finally {
-      this.isLookingUp.set(false);
-    }
-  }
+  // async searchVehicle() {
+  //   const query = this.state.vehicleLookupQuery().trim();
+  //   if (!query || this.isLookingUp()) return;
+  //   this.lookupError.set('');
+  //   this.isLookingUp.set(true);
+  //   try {
+  //     const result = await this.vehicleLookup.search(query);
+  //     this.state.setVehicleLookupResult(result);
+  //     if (result.year) {
+  //       this.state.patchVehicle({ vehicleYear: result.year });
+  //     }
+  //   } catch (error) {
+  //     this.state.setVehicleLookupResult(null);
+  //     this.lookupError.set(error instanceof Error ? error.message : 'No pude consultar el vehículo.');
+  //   } finally {
+  //     this.isLookingUp.set(false);
+  //   }
+  // }
 }

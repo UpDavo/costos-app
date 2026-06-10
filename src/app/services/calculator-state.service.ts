@@ -11,7 +11,7 @@ import {
   VehicleType,
 } from '../models/calculator.model';
 import { CostCalculationService, CURRENT_YEAR, FUEL_DATA, LITERS_PER_GALLON } from './cost-calculation.service';
-import type { VehicleLookupResult } from './vehicle-lookup.service';
+// import type { VehicleLookupResult } from './vehicle-lookup.service';
 import type { FuelPreset } from '../store/app.store';
 
 const STORAGE_KEY = 'costos-app-state';
@@ -100,8 +100,8 @@ export class CalculatorStateService {
   idle = signal<IdleData>({ ...DEFAULT_IDLE });
   obligations = signal<ObligationsData>({ ...DEFAULT_OBLIGATIONS });
   maintenanceItems = signal<MaintenanceItem[]>([...DEFAULT_MAINTENANCE]);
-  vehicleLookupQuery = signal('Ford Ranger 2.5 nafta 2023');
-  vehicleLookupResult = signal<VehicleLookupResult | null>(null);
+  // vehicleLookupQuery = signal('Ford Ranger 2.5 nafta 2023');
+  // vehicleLookupResult = signal<VehicleLookupResult | null>(null);
 
   constructor() {
     this.loadFromStorage();
@@ -113,8 +113,8 @@ export class CalculatorStateService {
         idle: this.idle(),
         obligations: this.obligations(),
         maintenanceItems: this.maintenanceItems(),
-        vehicleLookupQuery: this.vehicleLookupQuery(),
-        vehicleLookupResult: this.vehicleLookupResult(),
+        // vehicleLookupQuery: this.vehicleLookupQuery(),
+        // vehicleLookupResult: this.vehicleLookupResult(),
       };
 
       untracked(() => {
@@ -144,8 +144,8 @@ export class CalculatorStateService {
       }
       if (saved.idle) this.idle.set(saved.idle);
       if (saved.obligations) this.obligations.set(saved.obligations);
-      if (saved.vehicleLookupQuery) this.vehicleLookupQuery.set(saved.vehicleLookupQuery);
-      if (saved.vehicleLookupResult) this.vehicleLookupResult.set(saved.vehicleLookupResult);
+      // if (saved.vehicleLookupQuery) this.vehicleLookupQuery.set(saved.vehicleLookupQuery);
+      // if (saved.vehicleLookupResult) this.vehicleLookupResult.set(saved.vehicleLookupResult);
       if (saved.maintenanceItems) {
         this.maintenanceItems.set(saved.maintenanceItems);
         const maxId = (saved.maintenanceItems as MaintenanceItem[]).reduce(
@@ -210,13 +210,13 @@ export class CalculatorStateService {
     this.vehicle.update((v) => ({ ...v, ...patch }));
   }
 
-  setVehicleLookupQuery(query: string) {
-    this.vehicleLookupQuery.set(query);
-  }
+  // setVehicleLookupQuery(query: string) {
+  //   this.vehicleLookupQuery.set(query);
+  // }
 
-  setVehicleLookupResult(result: VehicleLookupResult | null) {
-    this.vehicleLookupResult.set(result);
-  }
+  // setVehicleLookupResult(result: VehicleLookupResult | null) {
+  //   this.vehicleLookupResult.set(result);
+  // }
 
   patchFuel(patch: Partial<FuelData>) {
     this.fuel.update((f) => ({ ...f, ...patch }));
@@ -403,7 +403,7 @@ export class CalculatorStateService {
     this.idle.set({ ...proforma.idle });
     this.obligations.set({ ...proforma.obligations });
     this.maintenanceItems.set([...proforma.maintenanceItems]);
-    this.vehicleLookupQuery.set(proforma.vehicleLookupQuery || proforma.name);
+    // this.vehicleLookupQuery.set(proforma.vehicleLookupQuery || proforma.name);
     this.nextId = proforma.maintenanceItems.reduce((m, i) => Math.max(m, i.id), 13) + 1;
   }
 
@@ -413,8 +413,8 @@ export class CalculatorStateService {
     this.idle.set({ ...DEFAULT_IDLE });
     this.obligations.set({ ...DEFAULT_OBLIGATIONS });
     this.maintenanceItems.set([...DEFAULT_MAINTENANCE]);
-    this.vehicleLookupQuery.set('Ford Ranger 2.5 nafta 2023');
-    this.vehicleLookupResult.set(null);
+    // this.vehicleLookupQuery.set('Ford Ranger 2.5 nafta 2023');
+    // this.vehicleLookupResult.set(null);
     this.nextId = 14;
     if (this.isBrowser) {
       localStorage.removeItem(STORAGE_KEY);
