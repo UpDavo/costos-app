@@ -1,94 +1,40 @@
-<div
-  class="p-5 flex flex-col gap-3">
+<div class="p-5 flex flex-col gap-3">
 
-  <!-- Vehicle search — disabled, sin backend aún
-  <div class="border-[1.5px] border-[var(--border2)] bg-[var(--surface2)] p-3 flex flex-col gap-3">
+  <!-- Marca y Modelo -->
+  <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
     <div class="flex flex-col gap-[5px]">
-      <label
-        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
-        Busca tu vehículo
-        <app-info-tip
-          text="Consulta una base pública por marca, modelo y año. Ej: Ford Ranger 2.5 nafta 2023." />
-      </label>
-      <div class="grid grid-cols-1 min-[520px]:grid-cols-[1fr_auto] gap-2">
-        <input
-          type="text"
-          class="input-field"
-          [ngModel]="state.vehicleLookupQuery()"
-          (ngModelChange)="state.setVehicleLookupQuery($event)"
-          (keydown.enter)="searchVehicle()"
-          placeholder="Ford Ranger 2.5 nafta 2023" />
-        <button
-          type="button"
-          class="h-[39px] px-4 bg-[var(--primary)] text-white text-[0.82rem] font-semibold flex items-center justify-center gap-2 border border-[var(--primary)] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-          [disabled]="isLookingUp()"
-          (click)="searchVehicle()">
-          <i class="pi" [ngClass]="isLookingUp() ? 'pi-spin pi-spinner' : 'pi-search'"></i>
-          <span>{{ isLookingUp() ? 'Buscando' : 'Buscar' }}</span>
-        </button>
-      </div>
+      <label class="text-[0.78rem] text-[var(--muted)] font-medium">Marca</label>
+      <app-searchable-select
+        [options]="makes"
+        placeholder="Selecciona marca"
+        [value]="state.vehicle().make"
+        (valueChange)="onMakeChange($event)" />
     </div>
-
-    @if (state.vehicleLookupResult(); as vehicle) {
-      <div class="bg-white border border-[var(--border)] p-3 grid grid-cols-1 min-[520px]:grid-cols-[1fr_auto] gap-3">
-        <div class="flex flex-col gap-1">
-          <div class="flex items-center gap-2 text-[0.72rem] text-[var(--primary)] font-mono uppercase tracking-widest">
-            <i class="pi pi-car text-[0.8rem]"></i>
-            Vehiculo encontrado
-          </div>
-          <strong class="text-[1rem] leading-tight text-[var(--text)]">
-            {{ vehicle.make }} {{ vehicle.model }}
-          </strong>
-          <span class="text-[0.78rem] text-[var(--muted)]">
-            {{ vehicle.year || 'Año no especificado' }}
-            @if (vehicle.vehicleType) {
-              <span> · {{ vehicle.vehicleType }}</span>
-            }
-          </span>
-        </div>
-        <div class="flex min-[520px]:items-end flex-col gap-1 text-[0.7rem] text-[var(--muted)]">
-          <span class="font-mono uppercase tracking-widest">{{ vehicle.sourceName }}</span>
-          <a
-            class="text-[var(--primary)] underline underline-offset-2"
-            [href]="vehicle.sourceUrl"
-            target="_blank"
-            rel="noreferrer">
-            Fuente publica
-          </a>
-        </div>
-        <p class="min-[520px]:col-span-2 m-0 text-[0.74rem] leading-relaxed text-[var(--muted)] border-t border-[var(--border)] pt-2">
-          {{ vehicle.note }}
-        </p>
-      </div>
-    }
-
-    @if (lookupError()) {
-      <div class="flex items-center gap-2 bg-[var(--red-dim)] text-[var(--red)] py-2 px-3 text-[0.76rem]">
-        <i class="pi pi-exclamation-triangle text-[0.78rem]"></i>
-        <span>{{ lookupError() }}</span>
-      </div>
-    }
+    <div class="flex flex-col gap-[5px]">
+      <label class="text-[0.78rem] text-[var(--muted)] font-medium">Modelo</label>
+      <app-searchable-select
+        [options]="models()"
+        placeholder="Selecciona modelo"
+        [disabled]="!state.vehicle().make"
+        [value]="state.vehicle().model"
+        (valueChange)="onModelChange($event)" />
+    </div>
   </div>
-  -->
 
-  <!-- Vehicle type selector -->
+  <!-- Tipo de vehículo -->
   <div class="flex flex-col gap-[5px]">
     <label class="text-[0.78rem] text-[var(--muted)] font-medium">Tipo de vehículo</label>
     <div class="grid grid-cols-2 gap-[6px]">
       <button
         class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.82rem] font-medium cursor-pointer transition-all duration-150"
-        [ngClass]="!state.isMoto()
-          ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
-          : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+        [ngClass]="!state.isMoto() ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]' : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
         (click)="state.setVehicleType('car')">
         <i class="pi pi-car text-[0.9rem]"></i>
         <span>Carro</span>
       </button>
       <button
         class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.82rem] font-medium cursor-pointer transition-all duration-150"
-        [ngClass]="state.isMoto()
-          ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
-          : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+        [ngClass]="state.isMoto() ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]' : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
         (click)="state.setVehicleType('motorcycle')">
         <i class="pi pi-cog text-[0.9rem]"></i>
         <span>Moto</span>
@@ -96,13 +42,125 @@
     </div>
   </div>
 
+  <!-- Tipo de propulsión -->
+  <div class="flex flex-col gap-[5px]">
+    <label class="text-[0.78rem] text-[var(--muted)] font-medium">Tipo de propulsión</label>
+    <div class="grid grid-cols-2 gap-[6px]">
+      <button
+        class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
+        [ngClass]="!state.vehicle().isElectric ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]' : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+        (click)="state.setElectric(false)">
+        <i class="pi pi-gauge text-[0.9rem]"></i>
+        <span>Combustión</span>
+      </button>
+      <button
+        class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
+        [ngClass]="state.vehicle().isElectric ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]' : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+        (click)="state.setElectric(true)">
+        <i class="pi pi-bolt text-[0.9rem]"></i>
+        <span>Eléctrico</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Combustión: Transmisión + Motor + Tracción -->
+  @if (!state.isElectric()) {
+    <div class="grid grid-cols-2 gap-3">
+
+      <!-- Transmisión -->
+      <div class="flex flex-col gap-[5px]">
+        <label class="text-[0.78rem] text-[var(--muted)] font-medium">Transmisión</label>
+        <div class="grid grid-cols-2 gap-[6px]">
+          <button
+            class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.75rem] font-medium cursor-pointer transition-all duration-150"
+            [ngClass]="state.vehicle().transmission === 'manual' ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]' : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+            (click)="state.setTransmission('manual')">
+            <i class="pi pi-cog text-[0.9rem]"></i>
+            <span>Manual</span>
+          </button>
+          <button
+            class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.75rem] font-medium cursor-pointer transition-all duration-150"
+            [ngClass]="state.vehicle().transmission === 'automatic' ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]' : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+            (click)="state.setTransmission('automatic')">
+            <i class="pi pi-cog text-[0.9rem]"></i>
+            <span>Auto</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tracción (solo carros) -->
+      @if (!state.isMoto()) {
+        <div class="flex flex-col gap-[5px]">
+          <label class="text-[0.78rem] text-[var(--muted)] font-medium">Tracción</label>
+          <div class="grid grid-cols-2 gap-[6px]">
+            <button
+              class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.75rem] font-medium cursor-pointer transition-all duration-150"
+              [ngClass]="state.vehicle().wheelDrive === '4x2' ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]' : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+              (click)="state.patchVehicle({ wheelDrive: '4x2' })">
+              <i class="pi pi-car text-[0.9rem]"></i>
+              <span>4x2</span>
+            </button>
+            <button
+              class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.75rem] font-medium cursor-pointer transition-all duration-150"
+              [ngClass]="state.vehicle().wheelDrive === '4x4' ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]' : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+              (click)="state.patchVehicle({ wheelDrive: '4x4' })">
+              <i class="pi pi-car text-[0.9rem]"></i>
+              <span>4x4</span>
+            </button>
+          </div>
+        </div>
+      }
+
+    </div>
+
+    <!-- Motor -->
+    <div class="flex flex-col gap-[5px]">
+      <label class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+        {{ state.isMoto() ? 'Cilindrada (cc)' : 'Motor' }}
+        <app-info-tip
+          [text]="state.isMoto()
+            ? 'Cilindrada en cc. Ej: 125, 250, 600, 1000. Motos más grandes consumen más combustible.'
+            : 'Cilindraje del motor. Ej: 1.6, 2.5, 3.2. Motores más grandes consumen más combustible.'" />
+      </label>
+      <div class="flex gap-[6px]">
+        <input
+          type="text"
+          class="input-field flex-1 min-w-0"
+          [ngModel]="state.vehicle().engineDisplacement"
+          (ngModelChange)="state.patchVehicle({ engineDisplacement: $event })"
+          [placeholder]="state.isMoto() ? '125, 250, 600…' : '2.5, 1.6T…'" />
+        @if (!state.isMoto()) {
+          <button
+            type="button"
+            class="h-[39px] px-3 border-[1.5px] text-[0.75rem] font-medium cursor-pointer transition-all duration-150 whitespace-nowrap"
+            [ngClass]="state.vehicle().turbo ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]' : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+            (click)="state.patchVehicle({ turbo: !state.vehicle().turbo })">
+            <i class="pi pi-bolt text-[0.75rem] mr-1"></i>Turbo
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Versión / variante (opcional) -->
+  <div class="flex flex-col gap-[5px]">
+    <label class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center gap-2">
+      Versión / trim
+      <span class="text-[0.65rem] font-normal text-[var(--muted)]">(opcional · ej: XLT, Sport, Limited)</span>
+    </label>
+    <input
+      type="text"
+      class="input-field"
+      [ngModel]="state.vehicle().trim"
+      (ngModelChange)="state.patchVehicle({ trim: $event })"
+      placeholder="XLT, Sport, Limited, SE…" />
+  </div>
+
   <!-- Is new toggle -->
   <button
     type="button"
     class="flex items-center justify-between px-4 py-3 border-[1.5px] cursor-pointer transition-all duration-150 text-left w-full"
-    [ngClass]="state.vehicle().isNew
-      ? 'border-[var(--primary)] bg-[var(--primary-dim)]'
-      : 'border-[var(--border2)] bg-[var(--surface2)]'"
+    [ngClass]="state.vehicle().isNew ? 'border-[var(--primary)] bg-[var(--primary-dim)]' : 'border-[var(--border2)] bg-[var(--surface2)]'"
     (click)="state.setIsNew(!state.vehicle().isNew)">
     <div>
       <div class="text-[0.82rem] font-semibold"
@@ -114,7 +172,6 @@
         {{ state.vehicle().isNew ? 'Calculando como compra nueva · precio = valor actual' : 'Activa para simplificar el formulario' }}
       </div>
     </div>
-    <!-- Toggle pill -->
     <div class="relative w-10 h-[22px] rounded-full flex-shrink-0 transition-colors duration-200"
          [ngClass]="state.vehicle().isNew ? 'bg-[var(--primary)]' : 'bg-[var(--border2)]'">
       <span class="absolute top-[3px] w-4 h-4 rounded-full bg-white shadow transition-all duration-200"
@@ -122,12 +179,10 @@
     </div>
   </button>
 
-  <!-- Precio de compra + Año (siempre visibles) -->
-  <div class="grid gap-3"
-       [ngClass]="state.isElectric() ? 'grid-cols-1 min-[520px]:grid-cols-2' : 'grid-cols-1 min-[520px]:grid-cols-3'">
+  <!-- Precio de compra + Año -->
+  <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
     <div class="flex flex-col gap-[5px]">
-      <label
-        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+      <label class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
         {{ state.vehicle().isNew ? 'Precio del auto nuevo' : 'Precio de compra' }} ({{ appStore.selectedCountry().currency }})
         <app-info-tip
           [text]="state.vehicle().isNew
@@ -142,11 +197,9 @@
 
     @if (!state.vehicle().isNew) {
       <div class="flex flex-col gap-[5px]">
-        <label
-          class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+        <label class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
           Año de compra / fabricación
-          <app-info-tip
-            text="Año en que compraste o se fabricó el auto. Se usa para calcular cuánto ha perdido de valor hasta hoy." />
+          <app-info-tip text="Año en que compraste o se fabricó el auto. Se usa para calcular cuánto ha perdido de valor hasta hoy." />
         </label>
         <div class="relative">
           <select
@@ -161,49 +214,15 @@
         </div>
       </div>
     }
-
-    @if (!state.isElectric()) {
-      <div class="flex flex-col gap-[5px]">
-        <label
-          class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
-          {{ state.isMoto() ? 'Cilindrada (cc)' : 'Motor' }}
-          <app-info-tip
-            [text]="state.isMoto()
-              ? 'Cilindrada en cc. Ej: 125, 250, 600, 1000. Motos más grandes consumen más combustible.'
-              : 'Cilindraje del motor. Ej: 1.6, 2.5, 3.2. Motores más grandes consumen más combustible.'" />
-        </label>
-        <div class="flex gap-[6px]">
-          <input
-            type="text"
-            class="input-field flex-1 min-w-0"
-            [ngModel]="state.vehicle().engineDisplacement"
-            (ngModelChange)="state.patchVehicle({ engineDisplacement: $event })"
-            [placeholder]="state.isMoto() ? '125, 250, 600…' : '2.5, 1.6T…'" />
-          @if (!state.isMoto()) {
-            <button
-              type="button"
-              class="h-[39px] px-3 border-[1.5px] text-[0.75rem] font-medium cursor-pointer transition-all duration-150 whitespace-nowrap"
-              [ngClass]="state.vehicle().turbo
-                ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
-                : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
-              (click)="state.patchVehicle({ turbo: !state.vehicle().turbo })">
-              <i class="pi pi-bolt text-[0.75rem] mr-1"></i>Turbo
-            </button>
-          }
-        </div>
-      </div>
-    }
   </div>
 
   <!-- Valor actual + Residual -->
   <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
     @if (!state.vehicle().isNew) {
       <div class="flex flex-col gap-[5px]">
-        <label
-          class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+        <label class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
           Valor actual del auto ({{ appStore.selectedCountry().currency }})
-          <app-info-tip
-            text="Precio al que podrías vender el auto HOY. Consulta Patiotuerca u OLX para referencias de tu modelo y año." />
+          <app-info-tip text="Precio al que podrías vender el auto HOY. Consulta Patiotuerca u OLX para referencias de tu modelo y año." />
         </label>
         <p-inputnumber [ngModel]="state.vehicle().vehicleValue"
           (ngModelChange)="state.patchVehicle({ vehicleValue: $event ?? 0 })"
@@ -212,13 +231,12 @@
       </div>
     }
     <div class="flex flex-col gap-[5px]" [ngClass]="state.vehicle().isNew ? 'min-[520px]:col-span-2' : ''">
-      <label
-        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+      <label class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
         {{ state.vehicle().isNew ? '¿A cuánto lo venderás?' : 'Valor residual estimado' }} ({{ appStore.selectedCountry().currency }})
         <app-info-tip
           [text]="state.vehicle().isNew
             ? 'Precio estimado al que venderás el auto después de los años que lo tendrás. Busca tu modelo en Patiotuerca con más años para estimar.'
-            : 'Cuánto esperas recibir al venderlo al final. Regla: 10–15% del precio original para autos de 10+ años. Busca tu modelo en Patiotuerca con más años.'" />
+            : 'Cuánto esperas recibir al venderlo al final. Regla: 10–15% del precio original para autos de 10+ años.'" />
       </label>
       <p-inputnumber [ngModel]="state.vehicle().residualValue"
         (ngModelChange)="state.patchVehicle({ residualValue: $event ?? 0 })"
@@ -230,11 +248,9 @@
   <!-- Km anuales + Vida útil -->
   <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
     <div class="flex flex-col gap-[5px]">
-      <label
-        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+      <label class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
         Kilómetros anuales recorridos
-        <app-info-tip
-          text="Km que recorres en un año típico. Tip: revisa el odómetro en enero y diciembre. Promedio: 15,000–25,000 km/año." />
+        <app-info-tip text="Km que recorres en un año típico. Tip: revisa el odómetro en enero y diciembre. Promedio: 15,000–25,000 km/año." />
       </label>
       <p-inputnumber [ngModel]="state.vehicle().annualKm"
         (ngModelChange)="state.patchVehicle({ annualKm: $event ?? 1000 })"
@@ -242,8 +258,7 @@
         inputStyleClass="input-field" />
     </div>
     <div class="flex flex-col gap-[5px]">
-      <label
-        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+      <label class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
         {{ state.vehicle().isNew ? '¿Cuántos años lo tendrás?' : 'Años de vida útil restantes' }}
         <app-info-tip
           [text]="state.vehicle().isNew
@@ -257,16 +272,14 @@
     </div>
   </div>
 
-  <!-- Odometro (solo si NO es nuevo) -->
+  <!-- Odómetro (solo si NO es nuevo) -->
   @if (!state.vehicle().isNew) {
     <div class="flex flex-col gap-2">
       <div class="grid grid-cols-1 min-[520px]:grid-cols-2 gap-3">
         <div class="flex flex-col gap-[5px]">
-          <label
-            class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+          <label class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
             Odómetro al comprar (km)
-            <app-info-tip
-              text="Kilómetros que tenía el auto cuando lo compraste. Escribe 0 si lo compraste nuevo. Afecta qué mantenimientos aplican desde el inicio." />
+            <app-info-tip text="Kilómetros que tenía el auto cuando lo compraste. Escribe 0 si lo compraste nuevo." />
           </label>
           <p-inputnumber [ngModel]="state.vehicle().purchaseKm"
             (ngModelChange)="state.patchVehicle({ purchaseKm: $event ?? 0 })"
@@ -275,11 +288,9 @@
             placeholder="0 = auto nuevo" />
         </div>
         <div class="flex flex-col gap-[5px]">
-          <label
-            class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+          <label class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
             Odómetro actual (km)
-            <app-info-tip
-              text="Kilómetros actuales del odómetro. Con el km de compra y el año, se estima tu km anual real." />
+            <app-info-tip text="Kilómetros actuales del odómetro. Con el km de compra y el año, se estima tu km anual real." />
           </label>
           <p-inputnumber [ngModel]="state.vehicle().currentKm"
             (ngModelChange)="state.patchVehicle({ currentKm: $event ?? 0 })"
@@ -303,74 +314,17 @@
     </div>
   }
 
-  <!-- Propulsion + Transmision -->
-  <div class="grid gap-3"
-       [ngClass]="state.isElectric() ? 'grid-cols-1' : 'grid-cols-2'">
-    <div class="flex flex-col gap-[5px]">
-      <label class="text-[0.78rem] text-[var(--muted)] font-medium">Tipo de propulsión</label>
-      <div class="grid grid-cols-2 gap-[6px]">
-        <button
-          class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
-          [ngClass]="!state.vehicle().isElectric
-            ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
-            : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
-          (click)="state.setElectric(false)">
-          <i class="pi pi-gauge text-[0.9rem]"></i>
-          <span>Combustión</span>
-        </button>
-        <button
-          class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
-          [ngClass]="state.vehicle().isElectric
-            ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
-            : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
-          (click)="state.setElectric(true)">
-          <i class="pi pi-bolt text-[0.9rem]"></i>
-          <span>Eléctrico</span>
-        </button>
-      </div>
-    </div>
-    @if (!state.isElectric()) {
-      <div class="flex flex-col gap-[5px]">
-        <label class="text-[0.78rem] text-[var(--muted)] font-medium">Transmisión</label>
-        <div class="grid grid-cols-2 gap-[6px]">
-          <button
-            class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
-            [ngClass]="state.vehicle().transmission === 'manual'
-              ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
-              : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
-            (click)="state.setTransmission('manual')">
-            <i class="pi pi-cog text-[0.9rem]"></i>
-            <span>Manual</span>
-          </button>
-          <button
-            class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.78rem] font-medium cursor-pointer transition-all duration-150"
-            [ngClass]="state.vehicle().transmission === 'automatic'
-              ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
-              : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
-            (click)="state.setTransmission('automatic')">
-            <i class="pi pi-cog text-[0.9rem]"></i>
-            <span>Automático</span>
-          </button>
-        </div>
-      </div>
-    }
-  </div>
-
-  <!-- Método de depreciación (solo si NO es nuevo — se fuerza acelerada) -->
+  <!-- Método de depreciación (solo si NO es nuevo) -->
   @if (!state.vehicle().isNew) {
     <div class="flex flex-col gap-[5px]">
-      <label
-        class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
+      <label class="text-[0.78rem] text-[var(--muted)] font-medium flex items-center flex-wrap gap-[2px]">
         Método de depreciación
-        <app-info-tip
-          text="Acelerada: los autos pierden más valor los primeros años (realidad del mercado ecuatoriano). Lineal: pérdida uniforme. Usa Acelerada para autos nuevos." />
+        <app-info-tip text="Acelerada: los autos pierden más valor los primeros años (realidad del mercado ecuatoriano). Lineal: pérdida uniforme." />
       </label>
       <div class="grid grid-cols-2 gap-[6px]">
         <button
           class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.8rem] font-medium cursor-pointer transition-all duration-150 text-center"
-          [ngClass]="state.vehicle().deprMethod === 'accel'
-                  ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
-                  : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+          [ngClass]="state.vehicle().deprMethod === 'accel' ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]' : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
           (click)="state.patchVehicle({ deprMethod: 'accel' })">
           <i class="pi pi-chart-line text-[0.9rem]"></i>
           <span>Acelerada</span>
@@ -378,9 +332,7 @@
         </button>
         <button
           class="flex flex-col items-center gap-[3px] py-[10px] px-2 border-[1.5px] text-[0.8rem] font-medium cursor-pointer transition-all duration-150 text-center"
-          [ngClass]="state.vehicle().deprMethod === 'linear'
-                  ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'
-                  : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
+          [ngClass]="state.vehicle().deprMethod === 'linear' ? 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]' : 'border-[var(--border2)] bg-[var(--surface2)] text-[var(--muted)]'"
           (click)="state.patchVehicle({ deprMethod: 'linear' })">
           <i class="pi pi-minus text-[0.9rem]"></i>
           <span>Lineal</span>
@@ -392,8 +344,7 @@
 
   <!-- Bottom info chip -->
   @if (state.vehicle().isNew) {
-    <div
-      class="flex items-center gap-2 bg-[var(--primary-dim)] border border-[var(--primary-dim2)] py-2 px-3 text-[0.78rem] text-[var(--primary)]">
+    <div class="flex items-center gap-2 bg-[var(--primary-dim)] border border-[var(--primary-dim2)] py-2 px-3 text-[0.78rem] text-[var(--primary)]">
       <i class="pi pi-info-circle text-[0.8rem] opacity-70"></i>
       <span>
         Auto nuevo · precio <b>{{ state.vehicle().purchasePrice | currency:appStore.selectedCountry().currency:'symbol':'1.0-0' }}</b>
@@ -401,30 +352,23 @@
         venta en {{ state.vehicle().usefulLife }} {{ state.vehicle().usefulLife === 1 ? 'año' : 'años' }} a
         <b>{{ state.vehicle().residualValue | currency:appStore.selectedCountry().currency:'symbol':'1.0-0' }}</b>
       </span>
-      <span
-        class="ml-auto flex items-center gap-1 bg-[var(--red-dim)] text-[var(--red)] py-[2px] px-2 text-[0.72rem] font-medium">
+      <span class="ml-auto flex items-center gap-1 bg-[var(--red-dim)] text-[var(--red)] py-[2px] px-2 text-[0.72rem] font-medium">
         <i class="pi pi-arrow-down text-[0.6rem]"></i>
-        {{ state.vehicle().purchasePrice - state.vehicle().residualValue |
-        currency:appStore.selectedCountry().currency:'symbol':'1.0-0' }}
+        {{ state.vehicle().purchasePrice - state.vehicle().residualValue | currency:appStore.selectedCountry().currency:'symbol':'1.0-0' }}
         ({{ newLossPct() }}%)
       </span>
     </div>
   } @else {
-    <div
-      class="flex items-center gap-2 bg-[var(--primary-dim)] border border-[var(--primary-dim2)] py-2 px-3 text-[0.78rem] text-[var(--primary)]">
+    <div class="flex items-center gap-2 bg-[var(--primary-dim)] border border-[var(--primary-dim2)] py-2 px-3 text-[0.78rem] text-[var(--primary)]">
       <i class="pi pi-tag text-[0.8rem] opacity-70"></i>
       <span>
-        En {{ ageLabel() }}: <b>{{ state.vehicle().purchasePrice |
-          currency:appStore.selectedCountry().currency:'symbol':'1.0-0' }}</b>
+        En {{ ageLabel() }}: <b>{{ state.vehicle().purchasePrice | currency:appStore.selectedCountry().currency:'symbol':'1.0-0' }}</b>
         <i class="pi pi-arrow-right text-[0.65rem] mx-1"></i>
-        <b>{{ state.vehicle().vehicleValue | currency:appStore.selectedCountry().currency:'symbol':'1.0-0'
-          }}</b>
+        <b>{{ state.vehicle().vehicleValue | currency:appStore.selectedCountry().currency:'symbol':'1.0-0' }}</b>
       </span>
-      <span
-        class="ml-auto flex items-center gap-1 bg-[var(--red-dim)] text-[var(--red)] py-[2px] px-2 text-[0.72rem] font-medium">
+      <span class="ml-auto flex items-center gap-1 bg-[var(--red-dim)] text-[var(--red)] py-[2px] px-2 text-[0.72rem] font-medium">
         <i class="pi pi-arrow-down text-[0.6rem]"></i>
-        {{ state.vehicle().purchasePrice - state.vehicle().vehicleValue |
-        currency:appStore.selectedCountry().currency:'symbol':'1.0-0' }}
+        {{ state.vehicle().purchasePrice - state.vehicle().vehicleValue | currency:appStore.selectedCountry().currency:'symbol':'1.0-0' }}
         ({{ lossPct() }}%)
       </span>
     </div>

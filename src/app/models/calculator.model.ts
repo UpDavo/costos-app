@@ -2,9 +2,14 @@ export type FuelType = 'extra' | 'super' | 'diesel' | 'electric';
 export type FuelUnit = 'kmL' | 'kmG';
 export type DeprMethod = 'accel' | 'linear';
 export type Transmission = 'manual' | 'automatic';
+export type WheelDrive = '' | '4x2' | '4x4';
 export type VehicleType = 'car' | 'motorcycle';
 
 export interface VehicleData {
+  make: string;
+  model: string;
+  trim: string;
+  wheelDrive: WheelDrive;
   vehicleType: VehicleType;
   purchasePrice: number;
   vehicleYear: number;
@@ -88,4 +93,21 @@ export interface SavedProforma {
   maintenanceItems: MaintenanceItem[];
   vehicleLookupQuery: string;
   result: CostBreakdown;
+}
+
+export interface CommunityVehicle {
+  id: string;
+  country_code: string;
+  make: string;
+  model: string;
+  trim: string;
+  year: number;
+  vehicle: VehicleData;
+  fuel: FuelData;
+  idle: IdleData;
+  obligations: ObligationsData;
+  maintenance_items: MaintenanceItem[];
+  result: CostBreakdown;
+  uses: number;
+  created_at: string;
 }

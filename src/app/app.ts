@@ -10,6 +10,8 @@ import { LocalePillComponent } from './components/shared/locale-pill.component';
 import { AccordionGroupComponent } from './components/shared/accordion-group.component';
 import { AccordionItemComponent } from './components/shared/accordion-item.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { CommunitySearchComponent } from './components/community-search/community-search.component';
+import { VehicleGateComponent } from './components/vehicle-gate/vehicle-gate.component';
 import { CalculatorStateService } from './services/calculator-state.service';
 
 @Component({
@@ -26,10 +28,16 @@ import { CalculatorStateService } from './services/calculator-state.service';
     AccordionGroupComponent,
     AccordionItemComponent,
     FooterComponent,
+    CommunitySearchComponent,
+    VehicleGateComponent,
   ],
   template: `
     <div class="min-h-screen bg-[var(--bg)] overflow-x-hidden font-sans flex flex-col">
       <app-hero />
+      @if (!state.gateCompleted()) {
+        <app-vehicle-gate />
+      }
+      <app-community-search />
       <div class="grid grid-cols-1 min-[901px]:grid-cols-[1fr_550px] gap-6 items-start py-6 px-4 min-[901px]:py-8 min-[901px]:px-8">
         <div>
           <app-accordion-group>

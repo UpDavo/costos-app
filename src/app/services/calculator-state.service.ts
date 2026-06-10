@@ -47,6 +47,10 @@ const DEFAULT_MAINTENANCE_MOTORCYCLE: MaintenanceItem[] = [
 ];
 
 const DEFAULT_VEHICLE: VehicleData = {
+  make: '',
+  model: '',
+  trim: '',
+  wheelDrive: '',
   vehicleType: 'car',
   purchasePrice: 22000,
   vehicleYear: 2022,
@@ -100,6 +104,7 @@ export class CalculatorStateService {
   idle = signal<IdleData>({ ...DEFAULT_IDLE });
   obligations = signal<ObligationsData>({ ...DEFAULT_OBLIGATIONS });
   maintenanceItems = signal<MaintenanceItem[]>([...DEFAULT_MAINTENANCE]);
+  gateCompleted = signal(false);
   // vehicleLookupQuery = signal('Ford Ranger 2.5 nafta 2023');
   // vehicleLookupResult = signal<VehicleLookupResult | null>(null);
 
@@ -113,6 +118,7 @@ export class CalculatorStateService {
         idle: this.idle(),
         obligations: this.obligations(),
         maintenanceItems: this.maintenanceItems(),
+        gateCompleted: this.gateCompleted(),
         // vehicleLookupQuery: this.vehicleLookupQuery(),
         // vehicleLookupResult: this.vehicleLookupResult(),
       };
@@ -144,6 +150,7 @@ export class CalculatorStateService {
       }
       if (saved.idle) this.idle.set(saved.idle);
       if (saved.obligations) this.obligations.set(saved.obligations);
+      if (saved.gateCompleted) this.gateCompleted.set(true);
       // if (saved.vehicleLookupQuery) this.vehicleLookupQuery.set(saved.vehicleLookupQuery);
       // if (saved.vehicleLookupResult) this.vehicleLookupResult.set(saved.vehicleLookupResult);
       if (saved.maintenanceItems) {

@@ -1,23 +1,25 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { CalculatorStateService } from '../../services/calculator-state.service';
 import { CURRENT_YEAR } from '../../services/cost-calculation.service';
 import { AppStore } from '../../store/app.store';
-// import { VehicleLookupService } from '../../services/vehicle-lookup.service';
+import { MAKE_NAMES, getModelsForMake } from '../../data/vehicle-catalog';
 import { InfoTooltipComponent } from '../shared/info-tooltip.component';
+import { SearchableSelectComponent } from '../shared/searchable-select.component';
+
 @Component({
   selector: 'app-vehicle-card',
-  imports: [CommonModule, FormsModule, InputNumberModule, InfoTooltipComponent],
+  imports: [CommonModule, FormsModule, InputNumberModule, InfoTooltipComponent, SearchableSelectComponent],
   templateUrl: './vehicle-card.component.html',
 })
 export class VehicleCardComponent {
   state = inject(CalculatorStateService);
   appStore = inject(AppStore);
-  // private vehicleLookup = inject(VehicleLookupService);
-  // lookupError = signal('');
-  // isLookingUp = signal(false);
+
+  readonly makes = MAKE_NAMES;
+  models = computed(() => getModelsForMake(this.state.vehicle().make));
 
   readonly yearOptions: number[] = Array.from(
     { length: CURRENT_YEAR + 1 - 1990 + 1 },
@@ -49,22 +51,11 @@ export class VehicleCardComponent {
     return Math.round((v.currentKm - v.purchaseKm) / elapsed);
   });
 
-  // async searchVehicle() {
-  //   const query = this.state.vehicleLookupQuery().trim();
-  //   if (!query || this.isLookingUp()) return;
-  //   this.lookupError.set('');
-  //   this.isLookingUp.set(true);
-  //   try {
-  //     const result = await this.vehicleLookup.search(query);
-  //     this.state.setVehicleLookupResult(result);
-  //     if (result.year) {
-  //       this.state.patchVehicle({ vehicleYear: result.year });
-  //     }
-  //   } catch (error) {
-  //     this.state.setVehicleLookupResult(null);
-  //     this.lookupError.set(error instanceof Error ? error.message : 'No pude consultar el vehículo.');
-  //   } finally {
-  //     this.isLookingUp.set(false);
-  //   }
-  // }
+  onMakeChange(make: string) {
+    this.state.patchVehicle({ make, model: '' });
+  }
+
+  onModelChange(model: string) {
+    this.state.patchVehicle({ model });
+  }
 }

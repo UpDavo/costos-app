@@ -8,6 +8,7 @@ import { BreakdownChartComponent } from './breakdown-chart/breakdown-chart.compo
 import { DepreciationChartComponent } from './depreciation-chart/depreciation-chart.component';
 import { LITERS_PER_GALLON } from '../../services/cost-calculation.service';
 import { toPng } from 'html-to-image';
+import { SupabaseService } from '../../services/supabase.service';
 
 interface BreakdownRow { label: string; icon: string; perKm: number; color: string; }
 
@@ -26,29 +27,54 @@ export class ResultPanelComponent {
   state = inject(CalculatorStateService);
   appStore = inject(AppStore);
   proformaStorage = inject(ProformaStorageService);
+  private supabase = inject(SupabaseService);
 
   panelRef = viewChild<ElementRef>('resultPanel');
+
   screenshotLoading = signal(false);
 
-  saveFormOpen = signal(false);
+  modalOpen = signal(false);
   saveName = signal('');
-  saveResult = signal<'success' | 'full' | null>(null);
+  shareToggle = signal(false);
+  saveResult = signal<'success' | 'full' | 'error' | null>(null);
+  isSaving = signal(false);
 
-  openSaveForm(): void {
-    this.saveName.set('Mi vehículo');
-    this.saveFormOpen.set(true);
+  hasMakeModel = computed(() => {
+    const v = this.state.vehicle();
+    return !!(v.make && v.model);
+  });
+
+  canShare = this.hasMakeModel;
+
+  toggleShare() {
+    if (this.canShare()) this.shareToggle.update(v => !v);
+  }
+
+  openModal(): void {
+    const v = this.state.vehicle();
+    const name = v.make && v.model ? `${v.make} ${v.model}` : 'Mi vehículo';
+    this.saveName.set(name);
+    this.shareToggle.set(false);
+    this.saveResult.set(null);
+    this.isSaving.set(false);
+    this.modalOpen.set(true);
+  }
+
+  closeModal(): void {
+    this.modalOpen.set(false);
     this.saveResult.set(null);
   }
 
-  cancelSave(): void {
-    this.saveFormOpen.set(false);
+  async confirmSave(): Promise<void> {
+    if (this.isSaving()) return;
+    this.isSaving.set(true);
     this.saveResult.set(null);
-  }
 
-  confirmSave(): void {
     const country = this.appStore.selectedCountry();
+    const name = this.saveName().trim() || 'Mi vehículo';
+
     const saved = this.proformaStorage.save({
-      name: this.saveName().trim() || 'Mi vehículo',
+      name,
       countryCode: country.code,
       currency: country.currency,
       currencySymbol: country.currencySymbol,
@@ -60,15 +86,33 @@ export class ResultPanelComponent {
       vehicleLookupQuery: '',
       result: this.state.result(),
     });
-    if (saved) {
-      this.saveResult.set('success');
-      setTimeout(() => {
-        this.saveFormOpen.set(false);
-        this.saveResult.set(null);
-      }, 1400);
-    } else {
-      this.saveResult.set('full');
+
+    if (!saved) { this.saveResult.set('full'); this.isSaving.set(false); return; }
+
+    if (this.shareToggle() && this.canShare()) {
+      const v = this.state.vehicle();
+      try {
+        await this.supabase.save({
+          country_code: country.code,
+          make: v.make,
+          model: v.model,
+          trim: v.trim,
+          year: v.vehicleYear,
+          vehicle: v,
+          fuel: this.state.fuel(),
+          idle: this.state.idle(),
+          obligations: this.state.obligations(),
+          maintenance_items: this.state.maintenanceItems(),
+          result: this.state.result(),
+        });
+      } catch {
+        // local save succeeded — community share failed silently, don't block
+      }
     }
+
+    this.saveResult.set('success');
+    this.isSaving.set(false);
+    setTimeout(() => this.closeModal(), 1500);
   }
 
   async takeScreenshot() {

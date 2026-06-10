@@ -141,48 +141,17 @@
   <!-- Actions -->
   <div class="px-5 pb-5 flex flex-col gap-2">
 
-    <!-- Save proforma button / inline form -->
-    @if (!saveFormOpen()) {
-      <button
-        class="w-full py-[10px] px-4 bg-[var(--primary)] text-white text-[0.82rem] font-semibold cursor-pointer transition-all duration-150 flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed border border-[var(--primary)]"
-        (click)="openSaveForm()"
-        [disabled]="proformaStorage.isFull()">
-        <i class="pi pi-bookmark"></i>
-        {{ proformaStorage.isFull() ? 'Máximo ' + proformaStorage.maxCount + ' guardadas' : 'Guardar configuración' }}
-      </button>
-    } @else {
-      <div class="border-[1.5px] border-[var(--primary)] p-3 flex flex-col gap-2">
-        @if (saveResult() === 'success') {
-          <div class="flex items-center justify-center gap-2 py-2 text-[0.82rem] text-green-600 font-medium">
-            <i class="pi pi-check-circle"></i> ¡Configuración guardada!
-          </div>
-        } @else if (saveResult() === 'full') {
-          <div class="text-[0.78rem] text-red-500 text-center">
-            Ya tienes {{ proformaStorage.maxCount }} configuraciones guardadas. Elimina una primero.
-          </div>
-        } @else {
-          <div class="text-[0.7rem] font-mono uppercase tracking-widest text-[var(--muted)] mb-1">Nombre de la configuración</div>
-          <input
-            type="text"
-            class="input-field text-[0.82rem]"
-            [(ngModel)]="saveName"
-            placeholder="Ej: Toyota Corolla 2020"
-            (keydown.enter)="confirmSave()"
-            (keydown.escape)="cancelSave()" />
-          <div class="flex gap-2">
-            <button
-              class="flex-1 py-[8px] px-3 bg-[var(--primary)] text-white text-[0.78rem] font-semibold cursor-pointer border border-[var(--primary)] hover:opacity-90"
-              (click)="confirmSave()">
-              <i class="pi pi-check mr-1"></i>Guardar
-            </button>
-            <button
-              class="py-[8px] px-3 bg-transparent text-[var(--muted)] text-[0.78rem] cursor-pointer border border-[var(--border2)] hover:border-[var(--primary)] hover:text-[var(--primary)]"
-              (click)="cancelSave()">
-              Cancelar
-            </button>
-          </div>
-        }
-      </div>
+    <button
+      class="w-full py-[10px] px-4 bg-[var(--primary)] text-white text-[0.82rem] font-semibold cursor-pointer transition-all duration-150 flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed border border-[var(--primary)]"
+      (click)="openModal()"
+      [disabled]="proformaStorage.isFull() || !hasMakeModel()">
+      <i class="pi pi-bookmark"></i>
+      {{ proformaStorage.isFull() ? 'Máximo ' + proformaStorage.maxCount + ' guardadas' : 'Guardar configuración' }}
+    </button>
+    @if (!hasMakeModel()) {
+      <p class="text-[0.72rem] text-[var(--muted)] text-center -mt-1">
+        Selecciona marca y modelo en "Datos del vehículo" para guardar
+      </p>
     }
 
     <button
@@ -192,6 +161,7 @@
       <i class="pi" [ngClass]="screenshotLoading() ? 'pi-spin pi-spinner' : 'pi-image'"></i>
       {{ screenshotLoading() ? 'Generando...' : 'Descargar resumen PNG' }}
     </button>
+
     <button
       class="w-full py-[10px] px-4 bg-transparent border-[1.5px] border-[var(--border2)] text-[var(--muted)] text-[0.82rem] font-medium cursor-pointer transition-all duration-150 flex items-center justify-center gap-2 hover:border-[var(--primary)] hover:text-[var(--primary)]"
       (click)="state.reset()">
@@ -199,3 +169,107 @@
     </button>
   </div>
 </div>
+
+<!-- Save modal -->
+@if (modalOpen()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4"
+    style="background: rgba(0,0,0,0.55)"
+    (click)="closeModal()">
+    <div
+      class="w-full max-w-[400px] bg-white flex flex-col"
+      (click)="$event.stopPropagation()">
+
+      <!-- Modal header -->
+      <div class="flex items-center justify-between px-5 py-4 border-b border-[var(--border2)]">
+        <span class="text-[0.88rem] font-semibold text-[var(--text)]">Guardar configuración</span>
+        <button type="button" class="text-[var(--muted)] cursor-pointer p-1 hover:text-[var(--text)]" (click)="closeModal()">
+          <i class="pi pi-times text-[0.85rem]"></i>
+        </button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="px-5 py-4 flex flex-col gap-4">
+
+        @if (saveResult() === 'success') {
+          <div class="flex flex-col items-center gap-2 py-4 text-green-600">
+            <i class="pi pi-check-circle text-[2rem]"></i>
+            <span class="text-[0.85rem] font-medium">
+              ¡Guardado{{ shareToggle() && canShare() ? ' y compartido' : '' }}!
+            </span>
+          </div>
+        } @else {
+
+          <!-- Name input -->
+          <div class="flex flex-col gap-[5px]">
+            <label class="text-[0.75rem] text-[var(--muted)] font-medium">Nombre de la configuración</label>
+            <input
+              type="text"
+              class="input-field text-[0.85rem]"
+              [ngModel]="saveName()"
+              (ngModelChange)="saveName.set($event)"
+              placeholder="Ej: Toyota Corolla 2020"
+              (keydown.enter)="confirmSave()"
+              (keydown.escape)="closeModal()" />
+          </div>
+
+          <!-- Share toggle -->
+          <button
+            type="button"
+            class="flex items-center justify-between px-4 py-3 border-[1.5px] w-full text-left cursor-pointer transition-all duration-150"
+            [ngClass]="shareToggle()
+              ? 'border-[var(--primary)] bg-[var(--primary-dim)]'
+              : 'border-[var(--border2)] bg-[var(--surface2)]'"
+            [disabled]="!canShare()"
+            (click)="toggleShare()">
+            <div>
+              <div class="text-[0.82rem] font-medium flex items-center gap-2"
+                   [ngClass]="shareToggle() ? 'text-[var(--primary)]' : 'text-[var(--text)]'">
+                <i class="pi pi-users text-[0.8rem]"></i>
+                Compartir con la comunidad
+              </div>
+              <div class="text-[0.7rem] text-[var(--muted)] mt-[2px]">
+                @if (!canShare()) {
+                  Selecciona marca y modelo para activar
+                } @else {
+                  Ayuda a otros usuarios con el mismo vehículo
+                }
+              </div>
+            </div>
+            <div class="relative w-10 h-[22px] rounded-full flex-shrink-0 transition-colors duration-200 ml-3"
+                 [ngClass]="shareToggle() && canShare() ? 'bg-[var(--primary)]' : 'bg-[var(--border2)]'">
+              <span class="absolute top-[3px] w-4 h-4 rounded-full bg-white shadow transition-all duration-200"
+                    [ngClass]="shareToggle() && canShare() ? 'left-[22px]' : 'left-[3px]'"></span>
+            </div>
+          </button>
+
+          @if (saveResult() === 'full') {
+            <div class="text-[0.76rem] text-red-500">
+              Ya tienes {{ proformaStorage.maxCount }} configuraciones. Elimina una primero.
+            </div>
+          }
+
+          <!-- Actions -->
+          <div class="flex gap-2 pt-1">
+            <button
+              class="flex-1 py-[10px] px-4 bg-[var(--primary)] text-white text-[0.82rem] font-semibold cursor-pointer border border-[var(--primary)] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              (click)="confirmSave()"
+              [disabled]="isSaving()">
+              @if (isSaving()) {
+                <i class="pi pi-spin pi-spinner"></i> Guardando…
+              } @else {
+                <i class="pi pi-check"></i>
+                {{ shareToggle() && canShare() ? 'Guardar y compartir' : 'Guardar' }}
+              }
+            </button>
+            <button
+              class="py-[10px] px-4 text-[var(--muted)] text-[0.82rem] cursor-pointer border-[1.5px] border-[var(--border2)] hover:border-[var(--primary)] hover:text-[var(--primary)]"
+              (click)="closeModal()">
+              Cancelar
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

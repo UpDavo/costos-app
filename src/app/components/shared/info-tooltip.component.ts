@@ -1,27 +1,34 @@
 import { Component, input, signal, HostListener, ElementRef, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-info-tip',
+  imports: [CommonModule],
   template: `
     <span class="info-wrap">
       <button
         class="info-btn"
         type="button"
         (click)="onTap($event)"
-        (mouseenter)="open.set(true)"
+        (mouseenter)="showAt($event)"
         (mouseleave)="open.set(false)"
         aria-label="Más información"
       >
         <i class="pi pi-info-circle"></i>
       </button>
-      @if (open()) {
-        <span class="tip-box">{{ text() }}</span>
-      }
     </span>
+
+    @if (open()) {
+      <div
+        class="tip-box"
+        [style.top.px]="tipY()"
+        [style.left.px]="tipX()">
+        {{ text() }}
+      </div>
+    }
   `,
   styles: [`
     .info-wrap {
-      position: relative;
       display: inline-flex;
       align-items: center;
     }
@@ -44,10 +51,7 @@ import { Component, input, signal, HostListener, ElementRef, inject } from '@ang
     .info-btn:hover { color: var(--primary, #443FE9); background: var(--primary-dim, rgba(68,63,233,0.08)); }
     .info-btn .pi { font-size: 0.78rem; }
     .tip-box {
-      position: absolute;
-      bottom: calc(100% + 8px);
-      left: 50%;
-      transform: translateX(-50%);
+      position: fixed;
       background: #1e1e2e;
       color: #e5e7eb;
       font-size: 0.72rem;
@@ -60,22 +64,37 @@ import { Component, input, signal, HostListener, ElementRef, inject } from '@ang
       z-index: 9999;
       pointer-events: none;
       white-space: normal;
+      transform: translate(-50%, -100%);
     }
   `],
 })
 export class InfoTooltipComponent {
   text = input.required<string>();
   open = signal(false);
+  tipX = signal(0);
+  tipY = signal(0);
   private el = inject(ElementRef);
+
+  showAt(e: MouseEvent) {
+    const btn = (e.target as HTMLElement).closest('button') ?? (e.target as HTMLElement);
+    const rect = btn.getBoundingClientRect();
+    this.tipX.set(rect.left + rect.width / 2);
+    this.tipY.set(rect.top - 8);
+    this.open.set(true);
+  }
 
   onTap(e: MouseEvent) {
     e.stopPropagation();
-    this.open.update(v => !v);
+    if (this.open()) {
+      this.open.set(false);
+    } else {
+      this.showAt(e);
+    }
   }
 
-  @HostListener('document:click', ['$event.target'])
-  onDocClick(target: HTMLElement) {
-    if (!this.el.nativeElement.contains(target)) {
+  @HostListener('document:click', ['$event'])
+  onDocClick(e: Event) {
+    if (!this.el.nativeElement.contains(e.target as Node)) {
       this.open.set(false);
     }
   }

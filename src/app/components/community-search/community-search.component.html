@@ -1,0 +1,184 @@
+<!-- Main page section: header + horizontal recent cards -->
+<div class="px-4 min-[901px]:px-8 pt-4 pb-2">
+
+  <!-- Search trigger button (full width) -->
+  <button
+    type="button"
+    (click)="openModal()"
+    class="w-full flex items-center justify-between gap-3 px-4 py-3 mb-3 border-[1.5px] border-[var(--border2)] bg-[var(--surface2)] hover:border-[var(--primary)] hover:bg-[var(--primary-dim)] transition-all duration-150 cursor-pointer group">
+    <div class="flex items-center gap-3">
+      <i class="pi pi-users text-[var(--primary)] text-[0.85rem]"></i>
+      <div class="text-left">
+        <div class="text-[0.82rem] font-semibold text-[var(--text)]">Modelos de la comunidad</div>
+        <div class="text-[0.72rem] text-[var(--muted)]">Busca por marca y usa la configuración de otro usuario</div>
+      </div>
+    </div>
+    <i class="pi pi-search text-[var(--primary)] text-[0.85rem] flex-shrink-0 opacity-70 group-hover:opacity-100"></i>
+  </button>
+
+  <!-- Horizontal cards -->
+  @if (recent().length > 0) {
+    <div class="flex gap-3 overflow-x-auto scrollbar-none pb-1">
+      @for (entry of recent(); track entry.id) {
+        <div class="flex-shrink-0 w-[188px] border border-[var(--border2)] bg-[var(--surface2)] p-3 flex flex-col gap-2">
+          <div class="flex flex-col gap-[3px]">
+            <span class="text-[0.82rem] font-semibold text-[var(--text)] leading-tight truncate">
+              {{ entry.make }} {{ entry.model }}
+            </span>
+            <div class="flex items-center gap-[5px] flex-wrap">
+              @if (entry.trim) {
+                <span class="text-[0.67rem] text-[var(--primary)] font-medium truncate max-w-[90px]">{{ entry.trim }}</span>
+              }
+              @if (entry.year) {
+                <span class="text-[0.65rem] text-[var(--muted)] font-mono">{{ entry.year }}</span>
+              }
+              <span class="text-[0.61rem] px-[5px] py-[1px] border border-[var(--border2)] text-[var(--muted)] font-mono uppercase">
+                {{ fuelLabel(entry) }}
+              </span>
+            </div>
+          </div>
+          <div class="flex flex-col gap-[2px] text-[0.72rem] text-[var(--muted)]">
+            <span><b class="text-[var(--text)]">{{ entry.result.totalPerKm | number:'1.3-3' }}</b> {{ appStore.selectedCountry().currencySymbol }}/km</span>
+            <span><b class="text-[var(--text)]">{{ entry.result.monthlyTotal | number:'1.0-0' }}</b> {{ appStore.selectedCountry().currencySymbol }}/mes</span>
+            <span class="text-[0.63rem] text-[var(--muted)] font-mono mt-[2px]">{{ entry.created_at | date:'d MMM yyyy' }}</span>
+          </div>
+          <button
+            type="button"
+            class="mt-auto w-full h-[28px] text-[0.72rem] font-semibold border-[1.5px] cursor-pointer transition-all duration-150"
+            [ngClass]="applied() === entry.id
+              ? 'bg-[var(--green-dim,#dcfce7)] border-[var(--green,#16a34a)] text-[var(--green,#16a34a)]'
+              : 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'"
+            (click)="applyConfig(entry)">
+            @if (applied() === entry.id) {
+              <i class="pi pi-check text-[0.72rem]"></i>
+            } @else {
+              Usar
+            }
+          </button>
+        </div>
+      }
+    </div>
+  } @else {
+    <!-- Skeleton while loading -->
+    <div class="flex gap-3 overflow-x-hidden">
+      @for (n of [1,2,3,4]; track n) {
+        <div class="flex-shrink-0 w-[188px] h-[120px] border border-[var(--border2)] bg-[var(--surface2)] animate-pulse"></div>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- Search modal -->
+@if (isOpen()) {
+  <div
+    class="fixed inset-0 z-50 flex items-end min-[520px]:items-center justify-center p-0 min-[520px]:p-4"
+    style="background: rgba(15,15,15,0.78); backdrop-filter: blur(2px);"
+    data-backdrop="true"
+    (click)="onBackdropClick($event)">
+
+    <div class="w-full min-[520px]:max-w-[560px] bg-[var(--surface)] flex flex-col max-h-[90dvh] min-[520px]:max-h-[82vh]">
+
+      <!-- Modal header -->
+      <div class="flex items-center justify-between px-5 py-4 border-b border-[var(--border2)] flex-shrink-0">
+        <div class="flex items-center gap-2">
+          <i class="pi pi-search text-[var(--primary)] text-[0.85rem]"></i>
+          <span class="text-[0.88rem] font-semibold text-[var(--text)]">Buscar en la comunidad</span>
+        </div>
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="text-[var(--muted)] hover:text-[var(--text)] transition-colors cursor-pointer p-1">
+          <i class="pi pi-times text-[0.85rem]"></i>
+        </button>
+      </div>
+
+      <!-- Search controls -->
+      <div class="px-5 py-3 border-b border-[var(--border2)] flex-shrink-0">
+        <div class="grid grid-cols-1 min-[420px]:grid-cols-2 gap-2">
+          <app-searchable-select
+            [options]="makes"
+            placeholder="Buscar por marca…"
+            [value]="selectedMake()"
+            (valueChange)="onMakeChange($event)" />
+          <app-searchable-select
+            [options]="models()"
+            placeholder="Todos los modelos"
+            [disabled]="!selectedMake()"
+            [value]="selectedModel()"
+            (valueChange)="onModelChange($event)" />
+        </div>
+        @if (error()) {
+          <div class="flex items-center gap-2 text-[0.74rem] text-[var(--red)] pt-2">
+            <i class="pi pi-exclamation-triangle text-[0.75rem]"></i>
+            {{ error() }}
+          </div>
+        }
+      </div>
+
+      <!-- Results -->
+      <div class="overflow-y-auto flex-1">
+        @if (loading()) {
+          <div class="flex items-center gap-2 px-5 py-5 text-[0.76rem] text-[var(--muted)]">
+            <i class="pi pi-spin pi-spinner text-[var(--primary)]"></i>
+            Buscando…
+          </div>
+        } @else if (results().length > 0) {
+          <div class="divide-y divide-[var(--border2)]">
+            @for (entry of results(); track entry.id) {
+              <div class="flex items-center gap-3 px-5 py-3">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-[0.82rem] font-semibold text-[var(--text)]">{{ entry.make }} {{ entry.model }}</span>
+                    @if (entry.trim) {
+                      <span class="text-[0.72rem] text-[var(--primary)] font-medium">{{ entry.trim }}</span>
+                    }
+                    @if (entry.year) {
+                      <span class="text-[0.7rem] text-[var(--muted)] font-mono">{{ entry.year }}</span>
+                    }
+                    <span class="text-[0.68rem] px-[6px] py-[1px] border border-[var(--border2)] text-[var(--muted)] font-mono uppercase">
+                      {{ fuelLabel(entry) }}
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-3 mt-[2px] text-[0.72rem] text-[var(--muted)]">
+                    <span><b class="text-[var(--text)]">{{ entry.result.totalPerKm | number:'1.3-3' }}</b> {{ appStore.selectedCountry().currencySymbol }}/km</span>
+                    <span>·</span>
+                    <span><b class="text-[var(--text)]">{{ entry.result.monthlyTotal | number:'1.0-0' }}</b> {{ appStore.selectedCountry().currencySymbol }}/mes</span>
+                    @if (entry.uses > 0) {
+                      <span>·</span>
+                      <span class="flex items-center gap-1">
+                        <i class="pi pi-download text-[0.65rem]"></i>{{ entry.uses }}
+                      </span>
+                    }
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="flex-shrink-0 h-[34px] px-3 text-[0.75rem] font-semibold border-[1.5px] cursor-pointer transition-all duration-150"
+                  [ngClass]="applied() === entry.id
+                    ? 'bg-[var(--green-dim,#dcfce7)] border-[var(--green,#16a34a)] text-[var(--green,#16a34a)]'
+                    : 'bg-[var(--primary-dim)] border-[var(--primary)] text-[var(--primary)]'"
+                  (click)="applyConfig(entry)">
+                  @if (applied() === entry.id) {
+                    <i class="pi pi-check text-[0.75rem]"></i>
+                  } @else {
+                    Usar
+                  }
+                </button>
+              </div>
+            }
+          </div>
+        } @else if (selectedMake() && !loading()) {
+          <div class="px-5 py-5 text-[0.76rem] text-[var(--muted)]">
+            Sin resultados para <b class="text-[var(--text)]">{{ selectedMake() }}{{ selectedModel() ? ' ' + selectedModel() : '' }}</b> en la comunidad.
+          </div>
+        } @else if (!selectedMake()) {
+          <div class="px-5 py-5 text-[0.76rem] text-[var(--muted)]">
+            Selecciona una marca para buscar.
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+}
